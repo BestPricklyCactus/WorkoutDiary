@@ -24,15 +24,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.ViewModelProvider
+import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabase
+import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabaseProvider
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
 
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), WorkoutDatabaseProvider {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel = MainViewModel(this)
 
         setContent {
             WorkoutDiaryTheme {
@@ -44,6 +46,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun getDatabase(): WorkoutDatabase {
+        return WorkoutDatabase.getDatabase(context = this)
     }
 }
 
