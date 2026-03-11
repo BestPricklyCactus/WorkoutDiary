@@ -4,32 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.lifecycle.ViewModelProvider
-import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabase
 import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabaseProvider
+import ru.pricklycactus.workoutdiary.ui.MainScreen
+import ru.pricklycactus.workoutdiary.ui.MainUserEvent
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
+import androidx.compose.runtime.collectAsState
+import ru.pricklycactus.workoutdiary.ui.MainViewModel
 
-
-class MainActivity : ComponentActivity(), WorkoutDatabaseProvider {
+class MainActivity : ComponentActivity(){
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,73 +23,33 @@ class MainActivity : ComponentActivity(), WorkoutDatabaseProvider {
 
         setContent {
             WorkoutDiaryTheme {
-                val viewState by viewModel.viewState.observeAsState()
-                // Отображение viewState
-                viewState?.let { state ->
-                    // Пример отображения
-                    Text(text = state.searchText)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainScreen(
+                        viewState = viewModel.viewState.collectAsState().value,
+                        onAddExerciseClick = {
+                            viewModel.processEvent(MainUserEvent.OnClick("add_exercise"))
+                        },
+                        onShowExercisesClick = {
+                            viewModel.processEvent(MainUserEvent.OnClick("show_exercises"))
+                        },
+                        onSaveExerciseClick = {
+                            viewModel.processEvent(MainUserEvent.OnClick("save_exercise"))
+                        },
+                        onCancelAddExerciseClick = {
+                            viewModel.processEvent(MainUserEvent.OnClick("cancel_add_exercise"))
+                        },
+                        onExerciseNameChange = { text ->
+                            viewModel.processEvent(MainUserEvent.OnTextChanged("name", text))
+                        },
+                        onExerciseDescriptionChange = { text ->
+                            viewModel.processEvent(MainUserEvent.OnTextChanged("description", text))
+                        }
+                    )
                 }
             }
         }
-    }
-
-    override fun getDatabase(): WorkoutDatabase {
-        return WorkoutDatabase.getDatabase(context = this)
-    }
-}
-
-@PreviewScreenSizes
-@Composable
-fun WorkoutDiaryApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(_root_ide_package_.ru.pricklycactus.workoutdiary.AppDestinations.HOME) }
-
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            _root_ide_package_.ru.pricklycactus.workoutdiary.AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
-                )
-            }
-        }
-    ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            _root_ide_package_.ru.pricklycactus.workoutdiary.Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
-    }
-}
-
-enum class AppDestinations(
-    val label: String,
-    val icon: ImageVector,
-) {
-    HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme {
-        _root_ide_package_.ru.pricklycactus.workoutdiary.Greeting("Android")
     }
 }
