@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabaseProvider
 import ru.pricklycactus.workoutdiary.ui.MainScreen
 import ru.pricklycactus.workoutdiary.ui.MainUserEvent
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
@@ -46,6 +45,15 @@ class MainActivity : ComponentActivity(){
                         },
                         onExerciseDescriptionChange = { text ->
                             viewModel.processEvent(MainUserEvent.OnTextChanged("description", text))
+                        },
+                        onExerciseSelected = { id, selected ->
+                            viewModel.processEvent(MainUserEvent.OnExerciseSelected(id, selected))
+                        },
+                        onStartWorkoutClick = {
+                            viewModel.processEvent(MainUserEvent.OnClick("start_workout"))
+                        },
+                        onBackToHome = {
+                            viewModel.processEvent(MainUserEvent.OnClick("back_to_main"))
                         }
                     )
                 }
