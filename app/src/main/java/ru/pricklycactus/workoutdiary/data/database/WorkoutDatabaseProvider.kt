@@ -1,4 +1,4 @@
-package ru.pricklycactus.workoutdiary.data.model;
+package ru.pricklycactus.workoutdiary.data.database
 
 import android.content.Context
 

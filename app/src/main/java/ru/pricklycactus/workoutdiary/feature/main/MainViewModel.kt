@@ -1,4 +1,4 @@
-package ru.pricklycactus.workoutdiary.ui
+package ru.pricklycactus.workoutdiary.feature.main
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.data.database.Exercise
-import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabase
-import ru.pricklycactus.workoutdiary.data.model.WorkoutDatabaseProvider
+import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabase
+import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabaseProvider
 
 class MainViewModel (
     private val context: Context
@@ -120,6 +120,28 @@ class MainViewModel (
                 }
                 updateState { it.copy(selectedExerciseIds = currentSelected) }
             }
+            is MainUserEvent.OnExercisesDelete -> {
+                viewModelScope.launch {
+                    val exerciseDao = WorkoutDatabaseProvider.getDatabase(context).exerciseDao()
+                    val exercisesToDelete = _viewState.value.exercises.filter {
+                        it.id in event.exerciseIds
+                    }
+
+                    exercisesToDelete.forEach { exerciseDao.deleteExercise(it) }
+
+                    val exercises = WorkoutDatabase.getDatabase(context)
+                        .exerciseDao()
+                        .getAllExercises()
+                        .first()
+
+                    updateState {
+                        it.copy(
+                            exercises = exercises,
+                            selectedExerciseIds = it.selectedExerciseIds - event.exerciseIds
+                        )
+                    }
+                }
+            }
             is MainUserEvent.OnExercisesLoaded -> {
 
             }
@@ -144,8 +166,11 @@ class MainViewModel (
             is MainUserEvent.OnExerciseSelected -> {
                 "Event: exercise_selected id=${event.exerciseId}, selected=${event.selected}"
             }
+            is MainUserEvent.OnExercisesDelete -> {
+                "Event: exercises_delete ids=${event.exerciseIds}"
+            }
             is MainUserEvent.OnExercisesLoaded -> {
-                "Event: exercises_loaded count=${event.exercises.size}"
+                "Event: exercises_loaded count=${event.exerciseCount}"
             }
         }
 

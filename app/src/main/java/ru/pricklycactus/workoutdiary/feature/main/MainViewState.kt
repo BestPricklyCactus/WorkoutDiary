@@ -1,4 +1,4 @@
-package ru.pricklycactus.workoutdiary.ui
+package ru.pricklycactus.workoutdiary.feature.main
 
 import ru.pricklycactus.workoutdiary.data.database.Exercise
 

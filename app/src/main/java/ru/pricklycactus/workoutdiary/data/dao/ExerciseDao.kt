@@ -1,4 +1,4 @@
-package ru.pricklycactus.workoutdiary.data.model
+package ru.pricklycactus.workoutdiary.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
