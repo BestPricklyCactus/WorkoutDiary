@@ -58,38 +58,11 @@ class MainActivity : ComponentActivity(){
                     when (currentScreen) {
                         Screen.MAIN -> MainScreen(
                             viewState = mainViewState,
-                            onAddExerciseClick = {
-                                viewModel.processEvent(MainUserEvent.OnClick("add_exercise"))
-                            },
-                            onShowExercisesClick = {
-                                viewModel.processEvent(MainUserEvent.OnClick("show_exercises"))
-                            },
+                            onEvent = viewModel::processEvent,
                             onShowHistoryClick = {
                                 historyViewModel = HistoryViewModel(workoutRepository)
                                 historyViewModel?.processEvent(HistoryUserEvent.LoadHistory)
                                 currentScreen = Screen.HISTORY
-                            },
-                            onSaveExerciseClick = {
-                                viewModel.processEvent(MainUserEvent.OnClick("save_exercise"))
-                            },
-                            onCancelAddExerciseClick = {
-                                viewModel.processEvent(MainUserEvent.OnClick("cancel_add_exercise"))
-                            },
-                            onExerciseNameChange = { text ->
-                                viewModel.processEvent(MainUserEvent.OnTextChanged("name", text))
-                            },
-                            onExerciseDescriptionChange = { text ->
-                                viewModel.processEvent(MainUserEvent.OnTextChanged("description", text))
-                            },
-                            onExerciseSelected = { id, selected ->
-                                viewModel.processEvent(MainUserEvent.OnExerciseSelected(id, selected))
-                            },
-                            onDeleteSelectedExercisesClick = {
-                                if (mainViewState.selectedExerciseIds.isNotEmpty()) {
-                                    viewModel.processEvent(
-                                        MainUserEvent.OnExercisesDelete(mainViewState.selectedExerciseIds)
-                                    )
-                                }
                             },
                             onStartWorkoutClick = {
                                 val selectedExercises = mainViewState.exercises.filter {
@@ -104,9 +77,6 @@ class MainActivity : ComponentActivity(){
                                     )
                                     currentScreen = Screen.WORKOUT
                                 }
-                            },
-                            onBackToHome = {
-                                viewModel.processEvent(MainUserEvent.OnClick("back_to_main"))
                             }
                         )
 

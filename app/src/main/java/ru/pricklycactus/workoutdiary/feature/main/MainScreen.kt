@@ -17,17 +17,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MainScreen(
     viewState: MainViewState,
-    onAddExerciseClick: () -> Unit,
-    onShowExercisesClick: () -> Unit,
+    onEvent: (MainUserEvent) -> Unit,
     onShowHistoryClick: () -> Unit,
-    onSaveExerciseClick: () -> Unit,
-    onCancelAddExerciseClick: () -> Unit,
-    onExerciseNameChange: (String) -> Unit,
-    onExerciseDescriptionChange: (String) -> Unit,
-    onExerciseSelected: (Long, Boolean) -> Unit,
-    onDeleteSelectedExercisesClick: () -> Unit,
     onStartWorkoutClick: () -> Unit,
-    onBackToHome: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -44,18 +36,18 @@ fun MainScreen(
             ) {
                 OutlinedTextField(
                     value = viewState.exerciseName,
-                    onValueChange = onExerciseNameChange,
+                    onValueChange = { onEvent(MainUserEvent.OnTextChanged("name", it)) },
                     label = { Text("Название упражнения") }
                 )
                 OutlinedTextField(
                     value = viewState.exerciseDescription,
-                    onValueChange = onExerciseDescriptionChange,
+                    onValueChange = { onEvent(MainUserEvent.OnTextChanged("description", it)) },
                     label = { Text("Описание") }
                 )
-                Button(onClick = onSaveExerciseClick) {
+                Button(onClick = { onEvent(MainUserEvent.OnClick("save_exercise")) }) {
                     Text("Добавить")
                 }
-                Button(onClick = onCancelAddExerciseClick) {
+                Button(onClick = { onEvent(MainUserEvent.OnClick("cancel_add_exercise")) }) {
                     Text("Отмена")
                 }
             }
@@ -75,7 +67,9 @@ fun MainScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                     IconButton(
-                        onClick = onDeleteSelectedExercisesClick,
+                        onClick = {
+                            onEvent(MainUserEvent.OnExercisesDelete(viewState.selectedExerciseIds))
+                        },
                         enabled = viewState.selectedExerciseIds.isNotEmpty()
                     ) {
                         Icon(
@@ -98,10 +92,17 @@ fun MainScreen(
                                     value = exercise.id in viewState.selectedExerciseIds,
                                     role = Role.Checkbox,
                                     onValueChange = { selected ->
-                                        onExerciseSelected(exercise.id, selected)
+                                        onEvent(MainUserEvent.OnExerciseSelected(exercise.id, selected))
                                     }
                                 )
-                                .clickable { onExerciseSelected(exercise.id, !viewState.selectedExerciseIds.contains(exercise.id)) }
+                                .clickable {
+                                    onEvent(
+                                        MainUserEvent.OnExerciseSelected(
+                                            exercise.id,
+                                            !viewState.selectedExerciseIds.contains(exercise.id)
+                                        )
+                                    )
+                                }
                                 .padding(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -127,16 +128,16 @@ fun MainScreen(
                     Text("Начать тренировку")
                 }
 
-                Button(onClick = onBackToHome) {
+                Button(onClick = { onEvent(MainUserEvent.OnClick("back_to_main")) }) {
                     Text("Назад")
                 }
             }
         } else {
             // Основной экран
-            Button(onClick = onAddExerciseClick) {
+            Button(onClick = { onEvent(MainUserEvent.OnClick("add_exercise")) }) {
                 Text("Добавить упражнение")
             }
-            Button(onClick = onShowExercisesClick) {
+            Button(onClick = { onEvent(MainUserEvent.OnClick("show_exercises")) }) {
                 Text("Просмотреть упражнения")
             }
             Button(onClick = onShowHistoryClick) {
