@@ -5,6 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import ru.pricklycactus.workoutdiary.R
 import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
@@ -25,7 +27,7 @@ fun MainScreen(
                 onClick = { onEvent(MainUserEvent.OnClick("show_exercises")) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("К списку упражнений")
+                Text(stringResource(R.string.main_to_exercises_list))
             }
         } else {
             ExercisesList(
@@ -43,7 +45,7 @@ fun MainScreen(
                     onClick = onNavigateToWorkout,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Начать тренировку")
+                    Text(stringResource(R.string.main_start_workout))
                 }
             }
         }

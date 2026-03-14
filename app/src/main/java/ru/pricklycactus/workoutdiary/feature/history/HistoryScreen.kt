@@ -12,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import ru.pricklycactus.workoutdiary.R
 import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 import ru.pricklycactus.workoutdiary.ui.theme.TimeConstants
 import java.text.SimpleDateFormat
@@ -29,10 +31,16 @@ fun HistoryScreen(
             .padding(Dimensions.ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
-        Text("История тренировок", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = stringResource(R.string.history_title),
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         if (viewState.workouts.isEmpty()) {
-            Text("Тренировок пока нет", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = stringResource(R.string.history_empty),
+                style = MaterialTheme.typography.bodyLarge
+            )
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -51,12 +59,20 @@ fun HistoryScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                text = "Общее время: ${formatDuration(workout.totalDurationMillis)}",
+                                text = stringResource(
+                                    R.string.history_total_time,
+                                    formatDuration(workout.totalDurationMillis)
+                                ),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             workout.exercises.forEach { exercise ->
                                 Text(
-                                    text = "${exercise.exerciseName}: ${exercise.sets} подходов x ${exercise.reps} повторений",
+                                    text = stringResource(
+                                        R.string.history_exercise_format,
+                                        exercise.exerciseName,
+                                        exercise.sets,
+                                        exercise.reps
+                                    ),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }

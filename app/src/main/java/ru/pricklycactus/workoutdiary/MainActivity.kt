@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
                             items.forEach { screen ->
                                 NavigationBarItem(
                                     icon = { Icon(screen.icon, contentDescription = null) },
-                                    label = { Text(screen.label) },
+                                    label = { Text(stringResource(screen.labelResId)) },
                                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                     onClick = {
                                         navController.navigate(screen.route) {
@@ -84,12 +85,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("workout_process") {
-                            // Logic to get selected exercises from mainViewState or elsewhere
                             val selectedExercises = mainViewState.exercises.filter { it.id in mainViewState.selectedExerciseIds }
                             val workoutViewModel = remember { WorkoutViewModel(selectedExercises, workoutRepository) }
                             val workoutViewState = workoutViewModel.viewState.collectAsState().value
 
-                            // Установка колбэка для навигации назад после сохранения
                             workoutViewModel.setOnFinishedCallback {
                                 navController.popBackStack()
                             }
@@ -124,10 +123,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-sealed class Screen(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    object Main : Screen("main", "Тренировка", Icons.Filled.PlayArrow)
-    object History : Screen("history", "История", Icons.Filled.History)
-    object Editor : Screen("editor", "Редактор", Icons.Filled.Settings)
+sealed class Screen(val route: String, val labelResId: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    object Main : Screen("main", R.string.nav_label_workout, Icons.Filled.PlayArrow)
+    object History : Screen("history", R.string.nav_label_history, Icons.Filled.History)
+    object Editor : Screen("editor", R.string.nav_label_editor, Icons.Filled.Settings)
 }
 
 val items = listOf(

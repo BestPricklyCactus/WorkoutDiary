@@ -1,3 +1,47 @@
 <resources>
-    <string name="app_name">WorkoutDiary</string>
+    <string name="app_name" translatable="false">WorkoutDiary</string>
+
+    <!-- Navigation -->
+    <string name="nav_label_workout" translatable="false">Тренировка</string>
+    <string name="nav_label_history" translatable="false">История</string>
+    <string name="nav_label_editor" translatable="false">Редактор</string>
+
+    <!-- History Screen -->
+    <string name="history_title" translatable="false">История тренировок</string>
+    <string name="history_empty" translatable="false">Тренировок пока нет</string>
+    <string name="history_total_time" translatable="false">Общее время: %s</string>
+    <string name="history_exercise_format" translatable="false">%1$s: %2$d подходов x %3$d повторений</string>
+
+    <!-- Main Screen -->
+    <string name="main_to_exercises_list" translatable="false">К списку упражнений</string>
+    <string name="main_start_workout" translatable="false">Начать тренировку</string>
+
+    <!-- Editor Screen -->
+    <string name="editor_title" translatable="false">Редактор упражнений</string>
+    <string name="editor_add_exercise" translatable="false">Добавить упражнение</string>
+
+    <!-- Exercise Components -->
+    <string name="exercise_name_label" translatable="false">Название</string>
+    <string name="exercise_description_label" translatable="false">Описание</string>
+    <string name="exercise_save" translatable="false">Сохранить</string>
+    <string name="exercise_cancel" translatable="false">Отмена</string>
+    <string name="exercise_list_title" translatable="false">Список упражнений</string>
+    <string name="exercise_delete_content_description" translatable="false">Удалить</string>
+
+    <!-- Workout Screen -->
+    <string name="workout_finish_dialog_title" translatable="false">Завершить тренировку?</string>
+    <string name="workout_finish_dialog_text" translatable="false">У вас есть неначатые упражнения. Вы уверены, что хотите завершить тренировку?</string>
+    <string name="workout_yes" translatable="false">Да</string>
+    <string name="workout_no" translatable="false">Нет</string>
+    <string name="workout_title" translatable="false">Тренировка</string>
+    <string name="workout_saving" translatable="false">Сохранение...</string>
+    <string name="workout_finish_button" translatable="false">Завершить тренировку</string>
+    <string name="workout_sets_label" translatable="false">Подходы: </string>
+    <string name="workout_reps_label" translatable="false">Повторения: </string>
+    <string name="workout_less_content_description" translatable="false">Меньше</string>
+    <string name="workout_more_content_description" translatable="false">Больше</string>
+    <string name="workout_duration_label" translatable="false">Время выполнения: %s</string>
+    <string name="workout_start_button" translatable="false">Начать</string>
+    <string name="workout_complete_button" translatable="false">Завершить</string>
+    <string name="workout_completed_status" translatable="false">Выполнено</string>
 </resources>

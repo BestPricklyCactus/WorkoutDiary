@@ -10,9 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import ru.pricklycactus.workoutdiary.R
 import ru.pricklycactus.workoutdiary.data.database.Exercise
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun ExerciseForm(
@@ -25,29 +27,29 @@ fun ExerciseForm(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
     ) {
         OutlinedTextField(
             value = exerciseName,
             onValueChange = onNameChange,
-            label = { Text("Название") },
+            label = { Text(stringResource(R.string.exercise_name_label)) },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = exerciseDescription,
             onValueChange = onDescriptionChange,
-            label = { Text("Описание") },
+            label = { Text(stringResource(R.string.exercise_description_label)) },
             modifier = Modifier.fillMaxWidth()
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
         ) {
             Button(onClick = onSave, modifier = Modifier.weight(1f)) {
-                Text("Сохранить")
+                Text(stringResource(R.string.exercise_save))
             }
             OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-                Text("Отмена")
+                Text(stringResource(R.string.exercise_cancel))
             }
         }
     }
@@ -66,17 +68,23 @@ fun ExercisesList(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Список упражнений", style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = stringResource(R.string.exercise_list_title),
+                style = MaterialTheme.typography.titleLarge
+            )
             if (onDeleteExercises != null && selectedExerciseIds.isNotEmpty()) {
                 IconButton(onClick = { onDeleteExercises(selectedExerciseIds) }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Удалить")
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.exercise_delete_content_description)
+                    )
                 }
             }
         }
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
         ) {
             items(exercises, key = { it.id }) { exercise ->
                 Row(
@@ -87,14 +95,14 @@ fun ExercisesList(
                             onValueChange = { onExerciseSelect(exercise.id, it) },
                             role = Role.Checkbox
                         )
-                        .padding(8.dp),
+                        .padding(Dimensions.ItemSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
                         checked = selectedExerciseIds.contains(exercise.id),
                         onCheckedChange = null
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.ItemSpacing))
                     Column {
                         Text(exercise.name, style = MaterialTheme.typography.bodyLarge)
                         if (exercise.description.isNotEmpty()) {
