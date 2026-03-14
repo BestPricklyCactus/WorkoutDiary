@@ -10,11 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.data.database.Exercise
-import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabase
-import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabaseProvider
+import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
+
 
 class MainViewModel (
-    private val context: Context
+    private val context: Context,
+    private val repository: WorkoutRepository
 ): ViewModel() {
 
     private companion object {
@@ -64,7 +65,7 @@ class MainViewModel (
                                 name = _viewState.value.exerciseName,
                                 description = _viewState.value.exerciseDescription
                             )
-                            WorkoutDatabaseProvider.getDatabase(context).exerciseDao().insertExercise(exercise)
+                            repository.insertExercise(exercise)
                         }
                         // Сбрасываем форму
                         updateState {
@@ -122,17 +123,13 @@ class MainViewModel (
             }
             is MainUserEvent.OnExercisesDelete -> {
                 viewModelScope.launch {
-                    val exerciseDao = WorkoutDatabaseProvider.getDatabase(context).exerciseDao()
                     val exercisesToDelete = _viewState.value.exercises.filter {
                         it.id in event.exerciseIds
                     }
 
-                    exercisesToDelete.forEach { exerciseDao.deleteExercise(it) }
+                    exercisesToDelete.forEach { repository.deleteExercise(it) }
 
-                    val exercises = WorkoutDatabase.getDatabase(context)
-                        .exerciseDao()
-                        .getAllExercises()
-                        .first()
+                    val exercises = repository.getAllExercises().first()
 
                     updateState {
                         it.copy(
@@ -150,7 +147,7 @@ class MainViewModel (
 
     private fun loadExercises() {
         viewModelScope.launch {
-            val exercises = WorkoutDatabase.getDatabase(context).exerciseDao().getAllExercises().first()
+            val exercises = repository.getAllExercises().first()
             updateState { it.copy(exercises = exercises) }
         }
     }

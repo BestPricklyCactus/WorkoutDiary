@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabaseProvider
+import javax.inject.Inject
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.history.HistoryScreen
 import ru.pricklycactus.workoutdiary.feature.history.HistoryUserEvent
@@ -27,7 +27,9 @@ import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
 
 class MainActivity : ComponentActivity(){
     private lateinit var viewModel: MainViewModel
-    private lateinit var workoutRepository: WorkoutRepository
+
+    @Inject
+    lateinit var workoutRepository: WorkoutRepository
 
     private enum class Screen {
         MAIN,
@@ -37,12 +39,10 @@ class MainActivity : ComponentActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = MainViewModel(this)
-        val database = WorkoutDatabaseProvider.getDatabase(this)
-        workoutRepository = WorkoutRepository(
-            exerciseDao = database.exerciseDao(),
-            workoutDao = database.workoutDao()
-        )
+        // Сначала выполняем инъекцию
+        (application as WorkoutDiaryApplication).appComponent.inject(this)
+        // Теперь workoutRepository инициализирован Dagger-ом и его можно передать
+        viewModel = MainViewModel(this, workoutRepository)
 
         setContent {
             var currentScreen by remember { mutableStateOf(Screen.MAIN) }
