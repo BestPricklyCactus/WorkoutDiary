@@ -3,161 +3,119 @@ package ru.pricklycactus.workoutdiary
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import javax.inject.Inject
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
+import ru.pricklycactus.workoutdiary.feature.editor.EditorScreen
+import ru.pricklycactus.workoutdiary.feature.editor.EditorViewModel
 import ru.pricklycactus.workoutdiary.feature.history.HistoryScreen
-import ru.pricklycactus.workoutdiary.feature.history.HistoryUserEvent
 import ru.pricklycactus.workoutdiary.feature.history.HistoryViewModel
 import ru.pricklycactus.workoutdiary.feature.main.MainScreen
-import ru.pricklycactus.workoutdiary.feature.main.MainUserEvent
 import ru.pricklycactus.workoutdiary.feature.main.MainViewModel
 import ru.pricklycactus.workoutdiary.feature.workout.WorkoutScreen
-import ru.pricklycactus.workoutdiary.feature.workout.WorkoutUserEvent
 import ru.pricklycactus.workoutdiary.feature.workout.WorkoutViewModel
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
+import javax.inject.Inject
 
-class MainActivity : ComponentActivity(){
-    private lateinit var viewModel: MainViewModel
+class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var workoutRepository: WorkoutRepository
 
-    private enum class Screen {
-        MAIN,
-        WORKOUT,
-        HISTORY
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Сначала выполняем инъекцию
         (application as WorkoutDiaryApplication).appComponent.inject(this)
-        // Теперь workoutRepository инициализирован Dagger-ом и его можно передать
-        viewModel = MainViewModel(this, workoutRepository)
 
         setContent {
-            var currentScreen by remember { mutableStateOf(Screen.MAIN) }
-            var workoutViewModel by remember { mutableStateOf<WorkoutViewModel?>(null) }
-            var historyViewModel by remember { mutableStateOf<HistoryViewModel?>(null) }
-            val mainViewState = viewModel.viewState.collectAsState().value
+            val navController = rememberNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+
+            val mainViewModel = remember { MainViewModel(this, workoutRepository) }
+            val mainViewState = mainViewModel.viewState.collectAsState().value
 
             WorkoutDiaryTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    when (currentScreen) {
-                        Screen.MAIN -> MainScreen(
-                            viewState = mainViewState,
-                            onEvent = viewModel::processEvent,
-                            onShowHistoryClick = {
-                                historyViewModel = HistoryViewModel(workoutRepository)
-                                historyViewModel?.processEvent(HistoryUserEvent.LoadHistory)
-                                currentScreen = Screen.HISTORY
-                            },
-                            onStartWorkoutClick = {
-                                val selectedExercises = mainViewState.exercises.filter {
-                                    it.id in mainViewState.selectedExerciseIds
-                                }
-
-                                if (selectedExercises.isNotEmpty()) {
-                                    viewModel.processEvent(MainUserEvent.OnClick("start_workout"))
-                                    workoutViewModel = WorkoutViewModel(
-                                        selectedExercises = selectedExercises,
-                                        repository = workoutRepository
-                                    )
-                                    currentScreen = Screen.WORKOUT
-                                }
-                            }
-                        )
-
-                        Screen.WORKOUT -> {
-                            val currentWorkoutViewModel = workoutViewModel
-
-                            if (currentWorkoutViewModel != null) {
-                                val workoutViewState = currentWorkoutViewModel.viewState.collectAsState().value
-
-                                WorkoutScreen(
-                                    viewState = workoutViewState,
-                                    onExerciseClick = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.ExerciseClicked(it)
-                                        )
-                                    },
-                                    onIncreaseReps = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.IncreaseReps(it)
-                                        )
-                                    },
-                                    onDecreaseReps = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.DecreaseReps(it)
-                                        )
-                                    },
-                                    onIncreaseSets = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.IncreaseSets(it)
-                                        )
-                                    },
-                                    onDecreaseSets = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.DecreaseSets(it)
-                                        )
-                                    },
-                                    onStartNow = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.StartNow(it)
-                                        )
-                                    },
-                                    onCompleteExercise = {
-                                        currentWorkoutViewModel.processEvent(
-                                            WorkoutUserEvent.CompleteExercise(it)
-                                        )
-                                    },
-                                    onDismissDialog = {
-                                        currentWorkoutViewModel.processEvent(WorkoutUserEvent.DismissDialog)
-                                    },
-                                    onBackClick = {
-                                        currentWorkoutViewModel.processEvent(WorkoutUserEvent.DismissDialog)
-                                        currentScreen = Screen.MAIN
-                                    },
-                                    onFinishWorkoutClick = {
-                                        currentWorkoutViewModel.finishWorkout {
-                                            workoutViewModel = null
-                                            viewModel.processEvent(MainUserEvent.OnClick("back_to_main"))
-                                            currentScreen = Screen.MAIN
+                Scaffold(
+                    bottomBar = {
+                        NavigationBar {
+                            items.forEach { screen ->
+                                NavigationBarItem(
+                                    icon = { Icon(screen.icon, contentDescription = null) },
+                                    label = { Text(screen.label) },
+                                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                    onClick = {
+                                        navController.navigate(screen.route) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
                                     }
                                 )
-                            } else {
-                                currentScreen = Screen.MAIN
                             }
                         }
+                    }
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.Main.route,
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        composable(Screen.Main.route) {
+                            MainScreen(
+                                viewState = mainViewState,
+                                onEvent = mainViewModel::processEvent,
+                                onNavigateToWorkout = { navController.navigate("workout_process") }
+                            )
+                        }
+                        composable("workout_process") {
+                            // Logic to get selected exercises from mainViewState or elsewhere
+                            val selectedExercises = mainViewState.exercises.filter { it.id in mainViewState.selectedExerciseIds }
+                            val workoutViewModel = remember { WorkoutViewModel(selectedExercises, workoutRepository) }
+                            val workoutViewState = workoutViewModel.viewState.collectAsState().value
 
-                        Screen.HISTORY -> {
-                            val currentHistoryViewModel = historyViewModel
-
-                            if (currentHistoryViewModel != null) {
-                                val historyViewState = currentHistoryViewModel.viewState.collectAsState().value
-
-                                HistoryScreen(
-                                    viewState = historyViewState,
-                                    onBackClick = {
-                                        currentScreen = Screen.MAIN
-                                    }
-                                )
-                            } else {
-                                currentScreen = Screen.MAIN
+                            // Установка колбэка для навигации назад после сохранения
+                            workoutViewModel.setOnFinishedCallback {
+                                navController.popBackStack()
                             }
+
+                            WorkoutScreen(
+                                viewState = workoutViewState,
+                                onEvent = workoutViewModel::processEvent,
+                            )
+                        }
+                        composable(Screen.History.route) {
+                            val historyViewModel = remember { HistoryViewModel(workoutRepository) }
+                            val historyViewState = historyViewModel.viewState.collectAsState().value
+
+                            HistoryScreen(
+                                viewState = historyViewState,
+                                onEvent = historyViewModel::processEvent
+                            )
+                        }
+                        composable(Screen.Editor.route) {
+                            val editorViewModel = remember { EditorViewModel(workoutRepository) }
+                            val editorViewState = editorViewModel.viewState.collectAsState().value
+
+                            EditorScreen(
+                                viewState = editorViewState,
+                                onEvent = editorViewModel::processEvent
+                            )
                         }
                     }
                 }
@@ -165,3 +123,15 @@ class MainActivity : ComponentActivity(){
         }
     }
 }
+
+sealed class Screen(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    object Main : Screen("main", "Тренировка", Icons.Filled.PlayArrow)
+    object History : Screen("history", "История", Icons.Filled.History)
+    object Editor : Screen("editor", "Редактор", Icons.Filled.Settings)
+}
+
+val items = listOf(
+    Screen.Main,
+    Screen.History,
+    Screen.Editor
+)

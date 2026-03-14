@@ -1,42 +1,44 @@
 package ru.pricklycactus.workoutdiary.feature.main
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.data.database.Exercise
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 
-
-class MainViewModel (
+class MainViewModel(
     private val context: Context,
     private val repository: WorkoutRepository
-): ViewModel() {
-
-    private companion object {
-        const val TAG = "MainViewModel"
-    }
+) : ViewModel() {
 
     private val _viewState = MutableStateFlow(MainViewState())
     val viewState: StateFlow<MainViewState> = _viewState
 
+    init {
+        observeExercises()
+    }
+
     private fun updateState(reducer: (MainViewState) -> MainViewState) {
         val previousState = _viewState.value
         val newState = reducer(previousState)
-        logStateChange(previousState, newState)
         _viewState.value = newState
     }
 
+    private fun observeExercises() {
+        viewModelScope.launch {
+            repository.getAllExercises().collectLatest { exercises ->
+                updateState { it.copy(exercises = exercises) }
+            }
+        }
+    }
+
     fun processEvent(event: MainUserEvent) {
-        logEvent(event)
         when (event) {
             is MainUserEvent.OnClick -> {
-                // Обработка кликов
                 when (event.action) {
                     "add_exercise" -> {
                         updateState {
@@ -48,8 +50,6 @@ class MainViewModel (
                         }
                     }
                     "show_exercises" -> {
-                        // Логика открытия списка упражнений
-                        loadExercises()
                         updateState {
                             it.copy(
                                 showExercisesList = true,
@@ -58,8 +58,6 @@ class MainViewModel (
                         }
                     }
                     "save_exercise" -> {
-                        // Логика сохранения упражнения
-                        // Сохраняем упражнение в базу данных
                         viewModelScope.launch {
                             val exercise = Exercise(
                                 name = _viewState.value.exerciseName,
@@ -67,7 +65,6 @@ class MainViewModel (
                             )
                             repository.insertExercise(exercise)
                         }
-                        // Сбрасываем форму
                         updateState {
                             it.copy(
                                 showAddExerciseForm = false,
@@ -86,19 +83,7 @@ class MainViewModel (
                         }
                     }
                     "start_workout" -> {
-
-                        // Логика начала тренировки
-                        // Здесь можно перейти к экрану тренировки
-                    }
-                    "back_to_main" -> {
-                        // Возвращаемся к главному экрану
-                        updateState {
-                            it.copy(
-                                showExercisesList = false,
-                                showAddExerciseForm = false,
-                                selectedExerciseIds = emptySet()
-                            )
-                        }
+                        // Перейти к экрану тренировки
                     }
                 }
             }
@@ -126,85 +111,17 @@ class MainViewModel (
                     val exercisesToDelete = _viewState.value.exercises.filter {
                         it.id in event.exerciseIds
                     }
-
                     exercisesToDelete.forEach { repository.deleteExercise(it) }
-
-                    val exercises = repository.getAllExercises().first()
-
                     updateState {
                         it.copy(
-                            exercises = exercises,
                             selectedExerciseIds = it.selectedExerciseIds - event.exerciseIds
                         )
                     }
                 }
             }
             is MainUserEvent.OnExercisesLoaded -> {
-
+                // Optional: handle event when exercises are loaded
             }
         }
-    }
-
-    private fun loadExercises() {
-        viewModelScope.launch {
-            val exercises = repository.getAllExercises().first()
-            updateState { it.copy(exercises = exercises) }
-        }
-    }
-
-    private fun logEvent(event: MainUserEvent) {
-        if (!isDebugLoggingEnabled()) return
-
-        val message = when (event) {
-            is MainUserEvent.OnClick -> "Event: click action=${event.action}"
-            is MainUserEvent.OnTextChanged -> {
-                "Event: text_changed field=${event.field}, value=${event.text}"
-            }
-            is MainUserEvent.OnExerciseSelected -> {
-                "Event: exercise_selected id=${event.exerciseId}, selected=${event.selected}"
-            }
-            is MainUserEvent.OnExercisesDelete -> {
-                "Event: exercises_delete ids=${event.exerciseIds}"
-            }
-            is MainUserEvent.OnExercisesLoaded -> {
-                "Event: exercises_loaded count=${event.exerciseCount}"
-            }
-        }
-
-        Log.d(TAG, message)
-    }
-
-    private fun logStateChange(previous: MainViewState, current: MainViewState) {
-        if (!isDebugLoggingEnabled() || previous == current) return
-
-        val changes = buildList {
-            if (previous.searchText != current.searchText) {
-                add("searchText=${current.searchText}")
-            }
-            if (previous.showAddExerciseForm != current.showAddExerciseForm) {
-                add("showAddExerciseForm=${current.showAddExerciseForm}")
-            }
-            if (previous.exerciseName != current.exerciseName) {
-                add("exerciseName=${current.exerciseName}")
-            }
-            if (previous.exerciseDescription != current.exerciseDescription) {
-                add("exerciseDescription=${current.exerciseDescription}")
-            }
-            if (previous.showExercisesList != current.showExercisesList) {
-                add("showExercisesList=${current.showExercisesList}")
-            }
-            if (previous.exercises != current.exercises) {
-                add("exercisesCount=${current.exercises.size}")
-            }
-            if (previous.selectedExerciseIds != current.selectedExerciseIds) {
-                add("selectedExerciseIds=${current.selectedExerciseIds}")
-            }
-        }
-
-        Log.d(TAG, "State changed: ${changes.joinToString()}")
-    }
-
-    private fun isDebugLoggingEnabled(): Boolean {
-        return context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     }
 }

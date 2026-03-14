@@ -20,7 +20,7 @@ enum class WorkoutExerciseStatus {
 
 data class WorkoutViewState(
     val exercises: List<WorkoutExerciseState> = emptyList(),
-    val selectedExerciseId: Long? = null,
     val workoutStartedAtMillis: Long = System.currentTimeMillis(),
-    val isSaving: Boolean = false
+    val isSaving: Boolean = false,
+    val showFinishConfirmation: Boolean = false
 )

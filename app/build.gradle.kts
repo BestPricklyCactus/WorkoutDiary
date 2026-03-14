@@ -6,11 +6,7 @@ plugins {
 
 android {
     namespace = "ru.pricklycactus.workoutdiary"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ru.pricklycactus.workoutdiary"
@@ -56,6 +52,7 @@ dependencies {
     //Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.compose)
 
     // Dagger
     implementation(libs.dagger)

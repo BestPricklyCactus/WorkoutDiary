@@ -23,11 +23,10 @@ class WorkoutViewModel(
     )
     val viewState: StateFlow<WorkoutViewState> = _viewState
 
+    private var onWorkoutFinished: (() -> Unit)? = null
+
     fun processEvent(event: WorkoutUserEvent) {
         when (event) {
-            is WorkoutUserEvent.ExerciseClicked -> {
-                _viewState.value = _viewState.value.copy(selectedExerciseId = event.exerciseId)
-            }
             is WorkoutUserEvent.IncreaseReps -> {
                 updateExercise(event.exerciseId) { it.copy(reps = it.reps + 1) }
             }
@@ -42,10 +41,26 @@ class WorkoutViewModel(
             }
             is WorkoutUserEvent.StartNow -> startExercise(event.exerciseId)
             is WorkoutUserEvent.CompleteExercise -> completeExercise(event.exerciseId)
-            WorkoutUserEvent.DismissDialog -> {
-                _viewState.value = _viewState.value.copy(selectedExerciseId = null)
+            WorkoutUserEvent.FinishClick -> {
+                val hasUnfinished = _viewState.value.exercises.any { it.status != WorkoutExerciseStatus.COMPLETED }
+                if (hasUnfinished) {
+                    _viewState.value = _viewState.value.copy(showFinishConfirmation = true)
+                } else {
+                    performFinish()
+                }
+            }
+            WorkoutUserEvent.ConfirmFinish -> {
+                _viewState.value = _viewState.value.copy(showFinishConfirmation = false)
+                performFinish()
+            }
+            WorkoutUserEvent.DismissFinishDialog -> {
+                _viewState.value = _viewState.value.copy(showFinishConfirmation = false)
             }
         }
+    }
+
+    fun setOnFinishedCallback(callback: () -> Unit) {
+        onWorkoutFinished = callback
     }
 
     private fun startExercise(exerciseId: Long) {
@@ -58,7 +73,6 @@ class WorkoutViewModel(
                 durationMillis = null
             )
         }
-        processEvent(WorkoutUserEvent.DismissDialog)
     }
 
     private fun completeExercise(exerciseId: Long) {
@@ -72,30 +86,38 @@ class WorkoutViewModel(
                 durationMillis = now - startedAt
             )
         }
-        processEvent(WorkoutUserEvent.DismissDialog)
     }
 
-    fun finishWorkout(onFinished: () -> Unit) {
+    private fun performFinish() {
         if (_viewState.value.isSaving) return
 
         val finishedAt = System.currentTimeMillis()
         val state = _viewState.value
-        val workouts = state.exercises.map { exerciseState ->
-            Workout(
-                exerciseId = exerciseState.exercise.id,
-                reps = exerciseState.reps,
-                sets = exerciseState.sets,
-                workoutDate = finishedAt,
-                totalDurationMillis = finishedAt - state.workoutStartedAtMillis,
-                exerciseDurationMillis = exerciseState.durationMillis ?: 0L
-            )
+        
+        // Save only completed exercises
+        val workouts = state.exercises
+            .filter { it.status == WorkoutExerciseStatus.COMPLETED }
+            .map { exerciseState ->
+                Workout(
+                    exerciseId = exerciseState.exercise.id,
+                    reps = exerciseState.reps,
+                    sets = exerciseState.sets,
+                    workoutDate = finishedAt,
+                    totalDurationMillis = finishedAt - state.workoutStartedAtMillis,
+                    exerciseDurationMillis = exerciseState.durationMillis ?: 0L
+                )
+            }
+
+        if (workouts.isEmpty()) {
+            onWorkoutFinished?.invoke()
+            return
         }
 
         _viewState.value = state.copy(isSaving = true)
         viewModelScope.launch {
             repository.insertWorkouts(workouts)
             _viewState.value = _viewState.value.copy(isSaving = false)
-            onFinished()
+            onWorkoutFinished?.invoke()
         }
     }
 
