@@ -12,7 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
+import ru.pricklycactus.workoutdiary.ui.theme.TimeConstants
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,8 +26,8 @@ fun HistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(Dimensions.ScreenPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         Text("История тренировок", style = MaterialTheme.typography.headlineMedium)
 
@@ -37,13 +38,13 @@ fun HistoryScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimensions.ListSpacing)
             ) {
                 items(viewState.workouts, key = { it.workoutDate }) { workout ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.padding(Dimensions.CardPadding),
+                            verticalArrangement = Arrangement.spacedBy(Dimensions.CardContentSpacing)
                         ) {
                             Text(
                                 text = formatWorkoutDate(workout.workoutDate),
@@ -73,8 +74,8 @@ internal fun formatWorkoutDate(workoutDate: Long): String {
 }
 
 private fun formatDuration(durationMillis: Long): String {
-    val totalSeconds = durationMillis / 1000
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return String.format("%02d:%02d", minutes, seconds)
+    val totalSeconds = durationMillis / TimeConstants.MillisPerSecond
+    val minutes = totalSeconds / TimeConstants.SecondsPerMinute
+    val seconds = totalSeconds % TimeConstants.SecondsPerMinute
+    return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }

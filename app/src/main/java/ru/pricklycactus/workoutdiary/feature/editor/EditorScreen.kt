@@ -12,9 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import ru.pricklycactus.workoutdiary.feature.main.ExerciseForm
 import ru.pricklycactus.workoutdiary.feature.main.ExercisesList
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun EditorScreen(
@@ -24,9 +24,9 @@ fun EditorScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(Dimensions.ScreenPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         Text("Редактор упражнений", style = MaterialTheme.typography.headlineMedium)
 
