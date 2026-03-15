@@ -3,11 +3,9 @@ package ru.pricklycactus.workoutdiary.feature.workout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -23,27 +21,38 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun WorkoutScreen(
-    viewState: WorkoutViewState,
-    onEvent: (WorkoutUserEvent) -> Unit
+    state: WorkoutViewState,
+    store: WorkoutStore,
+    onBack: () -> Unit
 ) {
-    if (viewState.showFinishConfirmation) {
+    LaunchedEffect(Unit) {
+        store.effect.collectLatest { effect ->
+            when (effect) {
+                WorkoutEffect.NavigateBack -> onBack()
+            }
+        }
+    }
+
+    if (state.showFinishConfirmation) {
         AlertDialog(
-            onDismissRequest = { onEvent(WorkoutUserEvent.DismissFinishDialog) },
+            onDismissRequest = { store.dispatch(WorkoutIntent.DismissFinishDialog) },
             title = { Text("Завершить тренировку?") },
             text = { Text("У вас есть неначатые упражнения. Вы уверены, что хотите завершить тренировку?") },
             confirmButton = {
-                TextButton(onClick = { onEvent(WorkoutUserEvent.ConfirmFinish) }) {
+                TextButton(onClick = { store.dispatch(WorkoutIntent.ConfirmFinish) }) {
                     Text("Да")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { onEvent(WorkoutUserEvent.DismissFinishDialog) }) {
+                TextButton(onClick = { store.dispatch(WorkoutIntent.DismissFinishDialog) }) {
                     Text("Нет")
                 }
             }
@@ -63,25 +72,25 @@ fun WorkoutScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(viewState.exercises, key = { it.exercise.id }) { exerciseState ->
+            items(state.exercises, key = { it.exercise.id }) { exerciseState ->
                 ExerciseItem(
                     exerciseState = exerciseState,
-                    onStartClick = { onEvent(WorkoutUserEvent.StartNow(exerciseState.exercise.id)) },
-                    onCompleteClick = { onEvent(WorkoutUserEvent.CompleteExercise(exerciseState.exercise.id)) },
-                    onIncreaseSets = { onEvent(WorkoutUserEvent.IncreaseSets(exerciseState.exercise.id)) },
-                    onDecreaseSets = { onEvent(WorkoutUserEvent.DecreaseSets(exerciseState.exercise.id)) },
-                    onIncreaseReps = { onEvent(WorkoutUserEvent.IncreaseReps(exerciseState.exercise.id)) },
-                    onDecreaseReps = { onEvent(WorkoutUserEvent.DecreaseReps(exerciseState.exercise.id)) }
+                    onStartClick = { store.dispatch(WorkoutIntent.StartNow(exerciseState.exercise.id)) },
+                    onCompleteClick = { store.dispatch(WorkoutIntent.CompleteExercise(exerciseState.exercise.id)) },
+                    onIncreaseSets = { store.dispatch(WorkoutIntent.IncreaseSets(exerciseState.exercise.id)) },
+                    onDecreaseSets = { store.dispatch(WorkoutIntent.DecreaseSets(exerciseState.exercise.id)) },
+                    onIncreaseReps = { store.dispatch(WorkoutIntent.IncreaseReps(exerciseState.exercise.id)) },
+                    onDecreaseReps = { store.dispatch(WorkoutIntent.DecreaseReps(exerciseState.exercise.id)) }
                 )
             }
         }
 
         Button(
-            onClick = { onEvent(WorkoutUserEvent.FinishClick) },
+            onClick = { store.dispatch(WorkoutIntent.FinishClick) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !viewState.isSaving
+            enabled = !state.isSaving
         ) {
-            Text(if (viewState.isSaving) "Сохранение..." else "Завершить тренировку")
+            Text(if (state.isSaving) "Сохранение..." else "Завершить тренировку")
         }
     }
 }

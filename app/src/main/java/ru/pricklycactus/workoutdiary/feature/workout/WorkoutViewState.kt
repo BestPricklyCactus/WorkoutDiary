@@ -1,5 +1,6 @@
 package ru.pricklycactus.workoutdiary.feature.workout
 
+import ru.pricklycactus.workoutdiary.core.mvi.MviState
 import ru.pricklycactus.workoutdiary.data.database.Exercise
 
 data class WorkoutExerciseState(
@@ -23,4 +24,4 @@ data class WorkoutViewState(
     val workoutStartedAtMillis: Long = System.currentTimeMillis(),
     val isSaving: Boolean = false,
     val showFinishConfirmation: Boolean = false
-)
+) : MviState

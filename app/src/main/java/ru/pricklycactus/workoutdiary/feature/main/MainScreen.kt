@@ -6,15 +6,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.flow.collectLatest
 import ru.pricklycactus.workoutdiary.R
 import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun MainScreen(
-    viewState: MainViewState,
-    onEvent: (MainUserEvent) -> Unit,
+    state: MainViewState,
+    store: MainStore,
     onNavigateToWorkout: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        store.effect.collectLatest { effect ->
+            when (effect) {
+                MainEffect.NavigateToWorkout -> onNavigateToWorkout()
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -22,27 +31,27 @@ fun MainScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
-        if (!viewState.showExercisesList) {
+        if (!state.showExercisesList) {
             Button(
-                onClick = { onEvent(MainUserEvent.OnClick("show_exercises")) },
+                onClick = { store.dispatch(MainIntent.OnClick("show_exercises")) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.main_to_exercises_list))
             }
         } else {
             ExercisesList(
-                exercises = viewState.exercises,
-                selectedExerciseIds = viewState.selectedExerciseIds,
+                exercises = state.exercises,
+                selectedExerciseIds = state.selectedExerciseIds,
                 onExerciseSelect = { id, selected ->
-                    onEvent(MainUserEvent.OnExerciseSelected(id, selected))
+                    store.dispatch(MainIntent.OnExerciseSelected(id, selected))
                 }
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (viewState.selectedExerciseIds.isNotEmpty()) {
+            if (state.selectedExerciseIds.isNotEmpty()) {
                 Button(
-                    onClick = onNavigateToWorkout,
+                    onClick = { store.dispatch(MainIntent.NavigateToWorkout) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.main_start_workout))

@@ -1,5 +1,6 @@
 package ru.pricklycactus.workoutdiary.feature.main
 
+import ru.pricklycactus.workoutdiary.core.mvi.MviState
 import ru.pricklycactus.workoutdiary.data.database.Exercise
 
 data class MainViewState(
@@ -10,4 +11,4 @@ data class MainViewState(
     val showExercisesList: Boolean = false,
     val exercises: List<Exercise> = emptyList(),
     val selectedExerciseIds: Set<Long> = emptySet()
-)
+) : MviState

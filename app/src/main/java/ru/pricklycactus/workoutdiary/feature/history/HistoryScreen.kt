@@ -22,8 +22,8 @@ import java.util.Locale
 
 @Composable
 fun HistoryScreen(
-    viewState: HistoryViewState,
-    onEvent: (HistoryUserEvent) -> Unit
+    state: HistoryViewState,
+    store: HistoryStore
 ) {
     Column(
         modifier = Modifier
@@ -36,7 +36,7 @@ fun HistoryScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        if (viewState.workouts.isEmpty()) {
+        if (state.workouts.isEmpty()) {
             Text(
                 text = stringResource(R.string.history_empty),
                 style = MaterialTheme.typography.bodyLarge
@@ -48,7 +48,7 @@ fun HistoryScreen(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.ListSpacing)
             ) {
-                items(viewState.workouts, key = { it.workoutDate }) { workout ->
+                items(state.workouts, key = { it.workoutDate }) { workout ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(
                             modifier = Modifier.padding(Dimensions.CardPadding),

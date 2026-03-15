@@ -12,14 +12,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import ru.pricklycactus.workoutdiary.R
 import ru.pricklycactus.workoutdiary.feature.main.ExerciseForm
 import ru.pricklycactus.workoutdiary.feature.main.ExercisesList
 import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun EditorScreen(
-    viewState: EditorViewState,
-    onEvent: (EditorUserEvent) -> Unit
+    state: EditorViewState,
+    store: EditorStore
 ) {
     Column(
         modifier = Modifier
@@ -28,36 +30,39 @@ fun EditorScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
-        Text("Редактор упражнений", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = stringResource(R.string.editor_title),
+            style = MaterialTheme.typography.headlineMedium
+        )
 
-        if (viewState.showAddExerciseForm) {
+        if (state.showAddExerciseForm) {
             ExerciseForm(
-                exerciseName = viewState.exerciseName,
-                exerciseDescription = viewState.exerciseDescription,
-                onNameChange = { onEvent(EditorUserEvent.OnTextChanged("name", it)) },
-                onDescriptionChange = { onEvent(EditorUserEvent.OnTextChanged("description", it)) },
-                onSave = { onEvent(EditorUserEvent.SaveExerciseClick) },
-                onCancel = { onEvent(EditorUserEvent.CancelAddExerciseClick) }
+                exerciseName = state.exerciseName,
+                exerciseDescription = state.exerciseDescription,
+                onNameChange = { store.dispatch(EditorIntent.OnTextChanged("name", it)) },
+                onDescriptionChange = { store.dispatch(EditorIntent.OnTextChanged("description", it)) },
+                onSave = { store.dispatch(EditorIntent.SaveExerciseClick) },
+                onCancel = { store.dispatch(EditorIntent.CancelAddExerciseClick) }
             )
         } else {
             Button(
-                onClick = { onEvent(EditorUserEvent.AddExerciseClick) },
+                onClick = { store.dispatch(EditorIntent.AddExerciseClick) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Добавить упражнение")
+                Text(stringResource(R.string.editor_add_exercise))
             }
         }
 
         Divider()
 
         ExercisesList(
-            exercises = viewState.exercises,
-            selectedExerciseIds = viewState.selectedExerciseIds,
+            exercises = state.exercises,
+            selectedExerciseIds = state.selectedExerciseIds,
             onExerciseSelect = { id, selected ->
-                onEvent(EditorUserEvent.OnExerciseSelected(id, selected))
+                store.dispatch(EditorIntent.OnExerciseSelected(id, selected))
             },
             onDeleteExercises = { ids ->
-                onEvent(EditorUserEvent.OnExercisesDelete(ids))
+                store.dispatch(EditorIntent.OnExercisesDelete(ids))
             }
         )
     }

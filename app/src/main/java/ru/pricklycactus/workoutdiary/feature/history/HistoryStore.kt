@@ -1,34 +1,29 @@
 package ru.pricklycactus.workoutdiary.feature.history
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ru.pricklycactus.workoutdiary.core.mvi.MviStore
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 
-class HistoryViewModel(
-    private val repository: WorkoutRepository
-) : ViewModel() {
-
-    private val _viewState = MutableStateFlow(HistoryViewState())
-    val viewState: StateFlow<HistoryViewState> = _viewState.asStateFlow()
+class HistoryStore(
+    private val repository: WorkoutRepository,
+    scope: CoroutineScope
+) : MviStore<HistoryViewState, HistoryIntent, HistoryEffect>(HistoryViewState(), scope) {
 
     init {
-        processEvent(HistoryUserEvent.LoadHistory)
+        dispatch(HistoryIntent.LoadHistory)
     }
 
-    fun processEvent(event: HistoryUserEvent) {
-        when (event) {
-            HistoryUserEvent.LoadHistory -> observeHistory()
+    override fun dispatch(intent: HistoryIntent) {
+        when (intent) {
+            HistoryIntent.LoadHistory -> observeHistory()
         }
     }
 
     private fun observeHistory() {
-        viewModelScope.launch {
-            repository.getWorkoutsWithExercises().collect { workouts ->
+        scope.launch {
+            repository.getWorkoutsWithExercises().collectLatest { workouts ->
                 val grouped = workouts
                     .groupBy { it.workout.workoutDate }
                     .toSortedMap(compareByDescending { it })
@@ -46,7 +41,7 @@ class HistoryViewModel(
                         )
                     }
 
-                _viewState.update { it.copy(workouts = grouped) }
+                updateState { it.copy(workouts = grouped) }
             }
         }
     }

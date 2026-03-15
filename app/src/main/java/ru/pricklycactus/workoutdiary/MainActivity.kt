@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -22,13 +23,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.editor.EditorScreen
-import ru.pricklycactus.workoutdiary.feature.editor.EditorViewModel
+import ru.pricklycactus.workoutdiary.feature.editor.EditorStore
 import ru.pricklycactus.workoutdiary.feature.history.HistoryScreen
-import ru.pricklycactus.workoutdiary.feature.history.HistoryViewModel
+import ru.pricklycactus.workoutdiary.feature.history.HistoryStore
 import ru.pricklycactus.workoutdiary.feature.main.MainScreen
-import ru.pricklycactus.workoutdiary.feature.main.MainViewModel
+import ru.pricklycactus.workoutdiary.feature.main.MainStore
 import ru.pricklycactus.workoutdiary.feature.workout.WorkoutScreen
-import ru.pricklycactus.workoutdiary.feature.workout.WorkoutViewModel
+import ru.pricklycactus.workoutdiary.feature.workout.WorkoutStore
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
 import javax.inject.Inject
 
@@ -45,9 +46,10 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
+            val scope = rememberCoroutineScope()
 
-            val mainViewModel = remember { MainViewModel(this, workoutRepository) }
-            val mainViewState = mainViewModel.viewState.collectAsState().value
+            val mainStore = remember { MainStore(workoutRepository, scope) }
+            val mainState by mainStore.state.collectAsState()
 
             WorkoutDiaryTheme {
                 Scaffold(
@@ -79,41 +81,38 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(Screen.Main.route) {
                             MainScreen(
-                                viewState = mainViewState,
-                                onEvent = mainViewModel::processEvent,
+                                state = mainState,
+                                store = mainStore,
                                 onNavigateToWorkout = { navController.navigate("workout_process") }
                             )
                         }
                         composable("workout_process") {
-                            val selectedExercises = mainViewState.exercises.filter { it.id in mainViewState.selectedExerciseIds }
-                            val workoutViewModel = remember { WorkoutViewModel(selectedExercises, workoutRepository) }
-                            val workoutViewState = workoutViewModel.viewState.collectAsState().value
-
-                            workoutViewModel.setOnFinishedCallback {
-                                navController.popBackStack()
-                            }
+                            val selectedExercises = mainState.exercises.filter { it.id in mainState.selectedExerciseIds }
+                            val workoutStore = remember { WorkoutStore(selectedExercises, workoutRepository, scope) }
+                            val workoutState by workoutStore.state.collectAsState()
 
                             WorkoutScreen(
-                                viewState = workoutViewState,
-                                onEvent = workoutViewModel::processEvent,
+                                state = workoutState,
+                                store = workoutStore,
+                                onBack = { navController.popBackStack() }
                             )
                         }
                         composable(Screen.History.route) {
-                            val historyViewModel = remember { HistoryViewModel(workoutRepository) }
-                            val historyViewState = historyViewModel.viewState.collectAsState().value
+                            val historyStore = remember { HistoryStore(workoutRepository, scope) }
+                            val historyState by historyStore.state.collectAsState()
 
                             HistoryScreen(
-                                viewState = historyViewState,
-                                onEvent = historyViewModel::processEvent
+                                state = historyState,
+                                store = historyStore
                             )
                         }
                         composable(Screen.Editor.route) {
-                            val editorViewModel = remember { EditorViewModel(workoutRepository) }
-                            val editorViewState = editorViewModel.viewState.collectAsState().value
+                            val editorStore = remember { EditorStore(workoutRepository, scope) }
+                            val editorState by editorStore.state.collectAsState()
 
                             EditorScreen(
-                                viewState = editorViewState,
-                                onEvent = editorViewModel::processEvent
+                                state = editorState,
+                                store = editorStore
                             )
                         }
                     }

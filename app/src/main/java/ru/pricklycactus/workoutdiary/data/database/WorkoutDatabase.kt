@@ -7,15 +7,17 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 //import androidx.room.TypeConverters
 import android.content.Context
+import androidx.room.TypeConverters
 import ru.pricklycactus.workoutdiary.data.dao.ExerciseDao
 import ru.pricklycactus.workoutdiary.data.dao.WorkoutDao
+import ru.pricklycactus.workoutdiary.data.model.ConvertersWD
 
 @Database(
     entities = [Exercise::class, Workout::class],
     version = 2,
     exportSchema = false
 )
-//@TypeConverters(ConvertersWD::class)
+@TypeConverters(ConvertersWD::class)
 abstract class WorkoutDatabase : RoomDatabase() {
     abstract fun exerciseDao(): ExerciseDao
     abstract fun workoutDao(): WorkoutDao
