@@ -37,6 +37,18 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:mvi"))
+    implementation(project(":data"))
+    implementation(project(":feature:common"))
+    implementation(project(":feature:main:api"))
+    implementation(project(":feature:main:impl"))
+    implementation(project(":feature:editor:api"))
+    implementation(project(":feature:editor:impl"))
+    implementation(project(":feature:history:api"))
+    implementation(project(":feature:history:impl"))
+    implementation(project(":feature:workout:api"))
+    implementation(project(":feature:workout:impl"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -48,6 +60,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.runtime.livedata)
+    implementation(libs.google.material)
 
     //Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -57,9 +70,6 @@ dependencies {
     // Dagger
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
-    // Room
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

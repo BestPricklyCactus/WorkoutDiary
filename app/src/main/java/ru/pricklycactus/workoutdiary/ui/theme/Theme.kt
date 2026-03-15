@@ -9,35 +9,40 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.Purple80,
-    secondary = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.PurpleGrey80,
-    tertiary = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.Pink80
+    primary = Purple80,
+    onPrimary = Color(0xFF381E72), // Темный текст на светлом фиолетовом
+    secondary = PurpleGrey80,
+    onSecondary = Color(0xFF332D41),
+    tertiary = Pink80,
+    onTertiary = Color(0xFF492532),
+    background = Color(0xFF1C1B1F),
+    onBackground = Color(0xFFE6E1E5),
+    surface = Color(0xFF1C1B1F),
+    onSurface = Color(0xFFE6E1E5)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.Purple40,
-    secondary = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.PurpleGrey40,
-    tertiary = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
+    primary = Purple40,
+    onPrimary = Color.White, // Белый текст на темном фиолетовом
+    secondary = PurpleGrey40,
     onSecondary = Color.White,
+    tertiary = Pink40,
     onTertiary = Color.White,
+    background = Color(0xFFFFFBFE),
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    surface = Color(0xFFFFFBFE),
+    onSurface = Color(0xFF1C1B1F)
 )
 
 @Composable
 fun WorkoutDiaryTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Выключаем dynamicColor по умолчанию для стабильности цветов
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -45,14 +50,13 @@ fun WorkoutDiaryTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
-        darkTheme -> _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.DarkColorScheme
-        else -> _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.LightColorScheme
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = _root_ide_package_.ru.pricklycactus.workoutdiary.ui.theme.Typography,
+        typography = Typography,
         content = content
     )
 }

@@ -1,0 +1,4 @@
+<resources>
+    <string name="editor_title" translatable="false">Редактор упражнений</string>
+    <string name="editor_add_exercise" translatable="false">Добавить упражнение</string>
+</resources>

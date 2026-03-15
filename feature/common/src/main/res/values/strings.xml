@@ -1,0 +1,8 @@
+<resources>
+    <string name="exercise_name_label" translatable="false">Название</string>
+    <string name="exercise_description_label" translatable="false">Описание</string>
+    <string name="exercise_save" translatable="false">Сохранить</string>
+    <string name="exercise_cancel" translatable="false">Отмена</string>
+    <string name="exercise_list_title" translatable="false">Список упражнений</string>
+    <string name="exercise_delete_content_description" translatable="false">Удалить</string>
+</resources>

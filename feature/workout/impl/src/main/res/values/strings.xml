@@ -1,0 +1,17 @@
+<resources>
+    <string name="workout_title" translatable="false">Тренировка</string>
+    <string name="workout_saving" translatable="false">Сохранение...</string>
+    <string name="workout_finish_button" translatable="false">Завершить тренировку</string>
+    <string name="workout_sets_label" translatable="false">Подходы: </string>
+    <string name="workout_reps_label" translatable="false">Повторения: </string>
+    <string name="workout_less_content_description" translatable="false">Меньше</string>
+    <string name="workout_more_content_description" translatable="false">Больше</string>
+    <string name="workout_duration_label" translatable="false">Время выполнения: %s</string>
+    <string name="workout_start_button" translatable="false">Начать</string>
+    <string name="workout_complete_button" translatable="false">Завершить</string>
+    <string name="workout_completed_status" translatable="false">Выполнено</string>
+    <string name="workout_finish_dialog_title" translatable="false">Завершить тренировку?</string>
+    <string name="workout_finish_dialog_text" translatable="false">У вас есть неначатые упражнения. Вы уверены, что хотите завершить тренировку?</string>
+    <string name="workout_yes" translatable="false">Да</string>
+    <string name="workout_no" translatable="false">Нет</string>
+</resources>

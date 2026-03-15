@@ -22,14 +22,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
-import ru.pricklycactus.workoutdiary.feature.editor.EditorScreen
-import ru.pricklycactus.workoutdiary.feature.editor.EditorStore
-import ru.pricklycactus.workoutdiary.feature.history.HistoryScreen
-import ru.pricklycactus.workoutdiary.feature.history.HistoryStore
-import ru.pricklycactus.workoutdiary.feature.main.MainScreen
-import ru.pricklycactus.workoutdiary.feature.main.MainStore
-import ru.pricklycactus.workoutdiary.feature.workout.WorkoutScreen
-import ru.pricklycactus.workoutdiary.feature.workout.WorkoutStore
+import ru.pricklycactus.workoutdiary.feature.editor.impl.EditorScreen
+import ru.pricklycactus.workoutdiary.feature.editor.impl.EditorStoreImpl
+import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryScreen
+import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryStoreImpl
+import ru.pricklycactus.workoutdiary.feature.main.impl.MainScreen
+import ru.pricklycactus.workoutdiary.feature.main.impl.MainStoreImpl
+import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutScreen
+import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutStoreImpl
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
 import javax.inject.Inject
 
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
             val currentDestination = navBackStackEntry?.destination
             val scope = rememberCoroutineScope()
 
-            val mainStore = remember { MainStore(workoutRepository, scope) }
+            val mainStore = remember { MainStoreImpl(workoutRepository, scope) }
             val mainState by mainStore.state.collectAsState()
 
             WorkoutDiaryTheme {
@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("workout_process") {
                             val selectedExercises = mainState.exercises.filter { it.id in mainState.selectedExerciseIds }
-                            val workoutStore = remember { WorkoutStore(selectedExercises, workoutRepository, scope) }
+                            val workoutStore = remember { WorkoutStoreImpl(selectedExercises, workoutRepository, scope) }
                             val workoutState by workoutStore.state.collectAsState()
 
                             WorkoutScreen(
@@ -98,7 +98,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Screen.History.route) {
-                            val historyStore = remember { HistoryStore(workoutRepository, scope) }
+                            val historyStore = remember { HistoryStoreImpl(workoutRepository, scope) }
                             val historyState by historyStore.state.collectAsState()
 
                             HistoryScreen(
@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Screen.Editor.route) {
-                            val editorStore = remember { EditorStore(workoutRepository, scope) }
+                            val editorStore = remember { EditorStoreImpl(workoutRepository, scope) }
                             val editorState by editorStore.state.collectAsState()
 
                             EditorScreen(

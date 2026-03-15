@@ -1,0 +1,4 @@
+<resources>
+    <string name="main_to_exercises_list" translatable="false">Список упражнений</string>
+    <string name="main_start_workout" translatable="false">Начать тренировку</string>
+</resources>
