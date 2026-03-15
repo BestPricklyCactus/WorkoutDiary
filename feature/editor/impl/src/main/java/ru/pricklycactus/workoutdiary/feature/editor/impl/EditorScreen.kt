@@ -64,7 +64,11 @@ fun EditorScreen(
             },
             onDeleteExercises = { ids ->
                 store.dispatch(EditorIntent.OnExercisesDelete(ids))
-            }
+            },
+            onEditExercise = { id ->
+                store.dispatch(EditorIntent.EditExerciseClick(id))
+            },
+            modifier = Modifier.weight(1f)
         )
     }
 }

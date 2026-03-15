@@ -17,16 +17,34 @@ class EditorStoreImpl(
 ) : MviStore<EditorViewState, EditorIntent, EditorEffect>(EditorViewState(), scope), EditorStore {
 
     init {
-        dispatch(EditorIntent.LoadExercises)
+        loadExercises()
     }
 
     override fun dispatch(intent: EditorIntent) {
         when (intent) {
             EditorIntent.AddExerciseClick -> updateState {
-                it.copy(showAddExerciseForm = true, exerciseName = "", exerciseDescription = "")
+                it.copy(
+                    showAddExerciseForm = true,
+                    editingExerciseId = null,
+                    exerciseName = "",
+                    exerciseDescription = ""
+                )
+            }
+            is EditorIntent.EditExerciseClick -> {
+                val exercise = currentState.exercises.find { it.id == intent.exerciseId }
+                if (exercise != null) {
+                    updateState {
+                        it.copy(
+                            showAddExerciseForm = true,
+                            editingExerciseId = exercise.id,
+                            exerciseName = exercise.name,
+                            exerciseDescription = exercise.description
+                        )
+                    }
+                }
             }
             EditorIntent.CancelAddExerciseClick -> updateState {
-                it.copy(showAddExerciseForm = false)
+                it.copy(showAddExerciseForm = false, editingExerciseId = null)
             }
             EditorIntent.SaveExerciseClick -> saveExercise()
             is EditorIntent.OnTextChanged -> handleTextChanged(intent.field, intent.text)
@@ -37,14 +55,16 @@ class EditorStoreImpl(
     }
 
     private fun saveExercise() {
+        if (currentState.exerciseName.isBlank()) return
+        
         scope.launch {
             val exercise = Exercise(
+                id = currentState.editingExerciseId ?: 0,
                 name = currentState.exerciseName,
                 description = currentState.exerciseDescription
             )
-            repository.insertExercise(exercise)
-            updateState { it.copy(showAddExerciseForm = false) }
-            loadExercises()
+            repository.upsertExercise(exercise)
+            updateState { it.copy(showAddExerciseForm = false, editingExerciseId = null) }
         }
     }
 
@@ -68,7 +88,6 @@ class EditorStoreImpl(
         scope.launch {
             val exercisesToDelete = currentState.exercises.filter { it.id in exerciseIds }
             exercisesToDelete.forEach { repository.deleteExercise(it) }
-            loadExercises()
             updateState { it.copy(selectedExerciseIds = emptySet()) }
         }
     }

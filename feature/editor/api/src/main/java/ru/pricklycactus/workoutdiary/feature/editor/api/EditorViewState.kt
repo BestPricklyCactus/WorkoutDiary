@@ -5,6 +5,7 @@ import ru.pricklycactus.workoutdiary.data.database.Exercise
 
 data class EditorViewState(
     val showAddExerciseForm: Boolean = false,
+    val editingExerciseId: Long? = null,
     val exerciseName: String = "",
     val exerciseDescription: String = "",
     val exercises: List<Exercise> = emptyList(),

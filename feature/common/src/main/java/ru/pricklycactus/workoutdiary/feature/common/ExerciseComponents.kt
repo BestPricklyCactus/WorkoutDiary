@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -61,6 +62,7 @@ fun ExercisesList(
     selectedExerciseIds: Set<Long>,
     onExerciseSelect: (Long, Boolean) -> Unit,
     onDeleteExercises: ((Set<Long>) -> Unit)? = null,
+    onEditExercise: ((Long) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -104,10 +106,18 @@ fun ExercisesList(
                         onCheckedChange = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(exercise.name, style = MaterialTheme.typography.bodyLarge)
                         if (exercise.description.isNotEmpty()) {
                             Text(exercise.description, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                    if (onEditExercise != null) {
+                        IconButton(onClick = { onEditExercise(exercise.id) }) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = null
+                            )
                         }
                     }
                 }

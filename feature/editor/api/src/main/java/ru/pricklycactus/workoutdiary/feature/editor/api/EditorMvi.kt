@@ -13,6 +13,7 @@ interface EditorStore {
 
 sealed interface EditorIntent : MviIntent {
     data object AddExerciseClick : EditorIntent
+    data class EditExerciseClick(val exerciseId: Long) : EditorIntent
     data object CancelAddExerciseClick : EditorIntent
     data object SaveExerciseClick : EditorIntent
     data class OnTextChanged(val field: String, val text: String) : EditorIntent
