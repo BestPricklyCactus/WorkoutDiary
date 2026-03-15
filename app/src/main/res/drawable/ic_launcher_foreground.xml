@@ -1,30 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:endX="85.84757"
-                android:endY="92.4963"
-                android:startX="42.9492"
-                android:startY="49.59793"
-                android:type="linear">
-                <item
-                    android:color="#44000000"
-                    android:offset="0.0" />
-                <item
-                    android:color="#00000000"
-                    android:offset="1.0" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <path
-        android:fillColor="#FFFFFF"
-        android:fillType="nonZero"
-        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-        android:strokeWidth="1"
-        android:strokeColor="#00000000" />
+
+    <!-- Overall group to center the icon -->
+    <group
+        android:translateX="54"
+        android:translateY="54">
+
+        <!-- Dumbbell Plates Left (Thinner and more elegant) -->
+        <!-- Plate 1 (Innermost) -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M-21,-18h-2.5c-1.1,0 -2,0.9 -2,2v32c0,1.1 0.9,2 2,2h2.5c1.1,0 2,-0.9 2,-2v-32c0,-1.1 -0.9,-2 -2,-2z" />
+        <!-- Plate 2 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M-28.5,-13h-2c-1,0 -1.8,0.8 -1.8,1.8v22.4c0,1 0.8,1.8 1.8,1.8h2c1,0 1.8,-0.8 1.8,-1.8v-22.4c0,-1 -0.8,-1.8 -1.8,-1.8z" />
+        <!-- Plate 3 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M-35,-8h-1.5c-0.8,0 -1.5,0.7 -1.5,1.5v13c0,0.8 0.7,1.5 1.5,1.5h1.5c0.8,0 1.5,-0.7 1.5,-1.5v-13c0,-0.8 -0.7,-1.5 -1.5,-1.5z" />
+        <!-- Plate 4 (Outermost) -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M-40.5,-4h-1.2c-0.6,0 -1.1,0.5 -1.1,1.1v5.8c0,0.6 0.5,1.1 1.1,1.1h1.2c0.6,0 1.1,-0.5 1.1,-1.1v-5.8c0,-0.6 -0.5,-1.1 -1.1,-1.1z" />
+
+        <!-- Dumbbell Plates Right (Symmetric) -->
+        <!-- Plate 1 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M21,-18h2.5c1.1,0 2,0.9 2,2v32c0,1.1 -0.9,2 -2,2h-2.5c-1.1,0 -2,-0.9 -2,-2v-32c0,-1.1 0.9,-2 2,-2z" />
+        <!-- Plate 2 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M28.5,-13h2c1,0 1.8,0.8 1.8,1.8v22.4c0,1 -0.8,1.8 -1.8,1.8h-2c-1,0 -1.8,-0.8 -1.8,-1.8v-22.4c0,-1 0.8,-1.8 1.8,-1.8z" />
+        <!-- Plate 3 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M35,-8h1.5c0.8,0 1.5,0.7 1.5,1.5v13c0,0.8 -0.7,1.5 -1.5,1.5h-1.5c-0.8,0 -1.5,-0.7 -1.5,-1.5v-13c0,-0.8 0.7,-1.5 1.5,-1.5z" />
+        <!-- Plate 4 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M40.5,-4h1.2c0.6,0 1.1,0.5 1.1,1.1v5.8c0,0.6 -0.5,1.1 -1.1,1.1h-1.2c-0.6,0 -1.1,-0.5 -1.1,-1.1v-5.8c0,-0.6 0.5,-1.1 1.1,-1.1z" />
+
+        <!-- Stopwatch Group -->
+        <group>
+            <!-- Outer Ring (Thinner stroke feel) -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M0,-19c-10.5,0 -19,8.5 -19,19s8.5,19 19,19s19,-8.5 19,-19S10.5,-19 0,-19zM0,17.2c-9.5,0 -17.2,-7.7 -17.2,-17.2S-9.5,-17.2 0,-17.2S17.2,-9.5 17.2,0S9.5,17.2 0,17.2z" />
+
+            <!-- Crown (Top Button) -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M-2.5,-23.5h5v3.5h-5z" />
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M-1.5,-25.5h3v2h-3z" />
+
+            <!-- Side Button -->
+            <group android:rotation="45">
+                <path
+                    android:fillColor="#FFFFFF"
+                    android:pathData="M-1,-23h2v3.5h-2z" />
+            </group>
+
+            <!-- Ticks (Very thin) -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M-0.3,-15h0.6v3.5h-0.6zM-0.3,11.5h0.6v3.5h-0.6zM11.5,-0.3v0.6h3.5v-0.6zM-15,-0.3v0.6h3.5v-0.6z" />
+
+            <!-- Needle (Precise) -->
+            <group android:rotation="60">
+                <path
+                    android:fillColor="#FFFFFF"
+                    android:pathData="M-0.4,-13h0.8v13.5h-0.8z" />
+            </group>
+
+            <!-- Center Dot -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M-1.2,0a1.2,1.2 0 1,0 2.4,0a1.2,1.2 0 1,0 -2.4,0" />
+        </group>
+    </group>
 </vector>
