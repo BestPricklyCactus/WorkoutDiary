@@ -61,9 +61,9 @@ fun ExercisesList(
     exercises: List<Exercise>,
     selectedExerciseIds: Set<Long>,
     onExerciseSelect: (Long, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     onDeleteExercises: ((Set<Long>) -> Unit)? = null,
-    onEditExercise: ((Long) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    onEditExercise: ((Long) -> Unit)? = null
 ) {
     Column(modifier = modifier) {
         Row(
