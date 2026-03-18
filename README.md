@@ -19,3 +19,32 @@ Android-приложение для ведения дневника тренир
 - Jetpack Compose
 - ViewModel
 - Room
+
+## OpenRouter
+
+Для AI-вкладки проект использует OpenRouter через OpenAI-compatible API.
+
+Что нужно сделать:
+
+1. Зарегистрироваться на `https://openrouter.ai/`
+2. Открыть раздел `Keys`
+3. Сгенерировать API key
+4. Добавить ключ и модель в `local.properties` в корне проекта
+
+Пример `local.properties`:
+
+```properties
+llmApiKey=sk-or-v1-...
+llmModel=meta-llama/llama-3.1-8b-instruct
+```
+
+Где взять данные:
+
+- `llmApiKey` - создается в личном кабинете OpenRouter, в разделе `Keys`
+- `llmModel` - это идентификатор модели из OpenRouter, например `meta-llama/llama-3.1-8b-instruct`
+
+Важно:
+
+- не добавляй `local.properties` в git
+- не публикуй API key в репозитории
+- если ключ скомпрометирован, удали его в OpenRouter и создай новый

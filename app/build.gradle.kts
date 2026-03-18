@@ -48,6 +48,8 @@ dependencies {
     implementation(project(":feature:history:impl"))
     implementation(project(":feature:workout:api"))
     implementation(project(":feature:workout:impl"))
+    implementation(project(":feature:aiworkout:api"))
+    implementation(project(":feature:aiworkout:impl"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -5,4 +5,5 @@
     <string name="nav_label_workout" translatable="false">Тренировка</string>
     <string name="nav_label_history" translatable="false">История</string>
     <string name="nav_label_editor" translatable="false">Редактор</string>
+    <string name="nav_label_ai_workout" translatable="false">AI</string>
 </resources>

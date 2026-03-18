@@ -1,0 +1,9 @@
+<resources>
+    <string name="ai_workout_title" translatable="false">AI тренировка</string>
+    <string name="ai_workout_prompt_label" translatable="false">Цель тренировки</string>
+    <string name="ai_workout_prompt_placeholder" translatable="false">Например: тренировка на ноги дома на 25 минут</string>
+    <string name="ai_workout_generate" translatable="false">Сгенерировать тренировку</string>
+    <string name="ai_workout_save_all" translatable="false">Сохранить все упражнения</string>
+    <string name="ai_workout_add_to_db" translatable="false">Добавить в мои упражнения</string>
+    <string name="ai_workout_saved" translatable="false">Уже добавлено</string>
+</resources>

@@ -18,10 +18,11 @@ import ru.pricklycactus.workoutdiary.feature.common.ExerciseForm
 import ru.pricklycactus.workoutdiary.feature.common.ExercisesList
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorIntent
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorStore
+import ru.pricklycactus.workoutdiary.feature.editor.api.EditorViewState
 
 @Composable
 fun EditorScreen(
-    state: ru.pricklycactus.workoutdiary.feature.editor.api.EditorViewState,
+    state: EditorViewState,
     store: EditorStore
 ) {
     Column(

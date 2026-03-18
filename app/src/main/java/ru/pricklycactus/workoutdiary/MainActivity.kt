@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
@@ -22,6 +23,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
+import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.AiWorkoutScreen
+import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.BuildConfig as AiWorkoutBuildConfig
+import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.AiWorkoutStoreImpl
+import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.LlmWorkoutGenerator
 import ru.pricklycactus.workoutdiary.feature.editor.impl.EditorScreen
 import ru.pricklycactus.workoutdiary.feature.editor.impl.EditorStoreImpl
 import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryScreen
@@ -115,6 +120,24 @@ class MainActivity : ComponentActivity() {
                                 store = editorStore
                             )
                         }
+                        composable(Screen.AiWorkout.route) {
+                            val aiWorkoutStore = remember {
+                                AiWorkoutStoreImpl(
+                                    repository = workoutRepository,
+                                    generator = LlmWorkoutGenerator(
+                                        apiKey = AiWorkoutBuildConfig.LLM_API_KEY,
+                                        model = AiWorkoutBuildConfig.LLM_MODEL
+                                    ),
+                                    scope = scope
+                                )
+                            }
+                            val aiWorkoutState by aiWorkoutStore.state.collectAsState()
+
+                            AiWorkoutScreen(
+                                state = aiWorkoutState,
+                                store = aiWorkoutStore
+                            )
+                        }
                     }
                 }
             }
@@ -126,10 +149,12 @@ sealed class Screen(val route: String, val labelResId: Int, val icon: androidx.c
     object Main : Screen("main", R.string.nav_label_workout, Icons.Filled.PlayArrow)
     object History : Screen("history", R.string.nav_label_history, Icons.Filled.History)
     object Editor : Screen("editor", R.string.nav_label_editor, Icons.Filled.Settings)
+    object AiWorkout : Screen("ai_workout", R.string.nav_label_ai_workout, Icons.Filled.AutoAwesome)
 }
 
 val items = listOf(
     Screen.Main,
     Screen.History,
-    Screen.Editor
+    Screen.Editor,
+    Screen.AiWorkout
 )
