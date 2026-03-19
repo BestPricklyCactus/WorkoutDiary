@@ -18,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiGeneratedExercise
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiWorkoutIntent
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiWorkoutStore
@@ -32,8 +32,8 @@ fun AiWorkoutScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(Dimensions.ScreenPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         Text(
             text = stringResource(R.string.ai_workout_title),
@@ -54,7 +54,7 @@ fun AiWorkoutScreen(
             enabled = !state.isLoading
         ) {
             if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
+                CircularProgressIndicator(modifier = Modifier.padding(end = Dimensions.ItemSpacing))
             }
             Text(stringResource(R.string.ai_workout_generate))
         }
@@ -77,7 +77,7 @@ fun AiWorkoutScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimensions.ListSpacing)
             ) {
                 items(state.generatedExercises, key = { it.id }) { exercise ->
                     AiExerciseCard(exercise = exercise, store = store)
@@ -94,13 +94,17 @@ private fun AiExerciseCard(
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(Dimensions.CardPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.CardContentSpacing)
         ) {
             Text(text = exercise.name, style = MaterialTheme.typography.titleMedium)
             Text(text = exercise.description, style = MaterialTheme.typography.bodyMedium)
             Text(
-                text = "Подходы: ${exercise.sets}  |  Повторения: ${exercise.reps}",
+                text = stringResource(
+                    R.string.ai_workout_sets_reps_format,
+                    exercise.sets,
+                    exercise.reps
+                ),
                 style = MaterialTheme.typography.bodyMedium
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {

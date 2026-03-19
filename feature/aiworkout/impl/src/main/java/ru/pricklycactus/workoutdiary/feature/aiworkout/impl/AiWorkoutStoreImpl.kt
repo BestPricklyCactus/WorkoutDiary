@@ -33,7 +33,7 @@ class AiWorkoutStoreImpl(
     private fun generateWorkout() {
         val prompt = currentState.prompt.trim()
         if (prompt.isBlank()) {
-            updateState { it.copy(error = "Опиши, какую тренировку ты хочешь") }
+            updateState { it.copy(error = AiWorkoutStrings.promptRequired) }
             return
         }
 
@@ -49,12 +49,12 @@ class AiWorkoutStoreImpl(
                         generatedExercises = plan.exercises
                     )
                 }
-                sendEffect(AiWorkoutEffect.ShowMessage("План тренировки готов"))
+                sendEffect(AiWorkoutEffect.ShowMessage(AiWorkoutStrings.planReady))
             }.onFailure { error ->
                 updateState {
                     it.copy(
                         isLoading = false,
-                        error = error.message ?: "Не удалось сгенерировать тренировку"
+                        error = error.message ?: AiWorkoutStrings.generationFailed
                     )
                 }
             }
@@ -73,14 +73,14 @@ class AiWorkoutStoreImpl(
                     }
                 )
             }
-            sendEffect(AiWorkoutEffect.ShowMessage("Упражнение добавлено в базу"))
+            sendEffect(AiWorkoutEffect.ShowMessage(AiWorkoutStrings.exerciseSaved))
         }
     }
 
     private fun saveAllExercisesToDatabase() {
         val exercisesToSave = currentState.generatedExercises.filterNot { it.isSaved }
         if (exercisesToSave.isEmpty()) {
-            sendEffect(AiWorkoutEffect.ShowMessage("Все упражнения уже сохранены"))
+            sendEffect(AiWorkoutEffect.ShowMessage(AiWorkoutStrings.allExercisesSaved))
             return
         }
 
@@ -89,7 +89,7 @@ class AiWorkoutStoreImpl(
             updateState { state ->
                 state.copy(generatedExercises = state.generatedExercises.map { it.copy(isSaved = true) })
             }
-            sendEffect(AiWorkoutEffect.ShowMessage("План сохранен в базу"))
+            sendEffect(AiWorkoutEffect.ShowMessage(AiWorkoutStrings.planSaved))
         }
     }
 
@@ -104,4 +104,13 @@ class AiWorkoutStoreImpl(
         return Exercise(name = name, description = details)
     }
 
+}
+
+private object AiWorkoutStrings {
+    const val promptRequired = "Опиши, какую тренировку ты хочешь"
+    const val planReady = "План тренировки готов"
+    const val exerciseSaved = "Упражнение добавлено в базу"
+    const val allExercisesSaved = "Все упражнения уже сохранены"
+    const val planSaved = "План сохранен в базу"
+    const val generationFailed = "Не удалось сгенерировать тренировку"
 }

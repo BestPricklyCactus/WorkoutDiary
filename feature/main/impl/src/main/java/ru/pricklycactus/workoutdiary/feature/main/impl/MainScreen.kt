@@ -16,13 +16,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import ru.pricklycactus.workoutdiary.feature.common.ExercisesList
 import ru.pricklycactus.workoutdiary.feature.main.api.MainEffect
 import ru.pricklycactus.workoutdiary.feature.main.api.MainIntent
 import ru.pricklycactus.workoutdiary.feature.main.api.MainStore
 import ru.pricklycactus.workoutdiary.feature.main.api.MainViewState
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun MainScreen(
@@ -41,13 +41,13 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(Dimensions.ScreenPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         if (!state.showExercisesList) {
             Button(
-                onClick = { store.dispatch(MainIntent.OnClick("show_exercises")) },
+                onClick = { store.dispatch(MainIntent.OnClick(MainActions.ShowExercises)) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.main_to_exercises_list))
@@ -76,4 +76,8 @@ fun MainScreen(
             }
         }
     }
+}
+
+internal object MainActions {
+    const val ShowExercises = "show_exercises"
 }

@@ -18,14 +18,14 @@ class LlmWorkoutGenerator(
 
     suspend fun generateWorkout(prompt: String): GeneratedWorkoutPlan = withContext(Dispatchers.IO) {
         require(apiKey.isNotBlank()) {
-            "Не найден ключ OpenRouter. Добавь llmApiKey в local.properties"
+            LlmWorkoutMessages.MissingApiKey
         }
 
         val connection = (URL("https://openrouter.ai/api/v1/chat/completions").openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
             doOutput = true
-            connectTimeout = 30000
-            readTimeout = 30000
+            connectTimeout = REQUEST_TIMEOUT_MILLIS
+            readTimeout = REQUEST_TIMEOUT_MILLIS
             setRequestProperty("Content-Type", "application/json")
             setRequestProperty("Authorization", "Bearer $apiKey")
             setRequestProperty("HTTP-Referer", "https://github.com/pricklycactus/WorkoutDiary")
@@ -42,15 +42,7 @@ class LlmWorkoutGenerator(
                             .put("role", "system")
                             .put(
                                 "content",
-                                "Ты фитнес-ассистент. Верни только валидный JSON без markdown, без пояснений, без текста до или после JSON. " +
-                                    "Ответ должен быть строго объектом формата {\"title\": string, \"exercises\": [{\"name\": string, \"description\": string, \"sets\": number, \"reps\": string}]}. " +
-                                    "Поле exercises обязательно должно быть массивом объектов, а не массивом строк. " +
-                                    "У каждого упражнения обязательно должны быть все 4 поля: name, description, sets, reps. " +
-                                    "sets должно быть целым числом от 2 до 5. reps должно быть строкой, например \"10-12\" или \"12\". " +
-                                    "Все названия и описания только на русском языке. " +
-                                    "Сгенерируй от 3 до 6 безопасных и реалистичных упражнений по запросу пользователя. " +
-                                    "Не используй английские слова, если есть русский аналог. " +
-                                    "Пример корректного формата: {\"title\":\"Тренировка на ягодицы\",\"exercises\":[{\"name\":\"Приседания\",\"description\":\"Держи спину ровно и напрягай ягодицы в верхней точке\",\"sets\":4,\"reps\":\"12\"}]}."
+                                LlmWorkoutMessages.SystemPrompt
                             )
                     )
                     put(
@@ -93,12 +85,12 @@ class LlmWorkoutGenerator(
         val json = runCatching { JSONObject(normalizedContent) }
             .getOrElse {
                 throw IllegalStateException(
-                    "OpenRouter вернул ответ в неожиданном формате. Попробуй еще раз или смени модель."
+                    LlmWorkoutMessages.InvalidResponseFormat
                 )
             }
         val exercisesJson = json.optJSONArray("exercises")
             ?: throw IllegalStateException(
-                "OpenRouter вернул план без списка exercises. Попробуй еще раз или смени модель."
+                LlmWorkoutMessages.MissingExercisesList
             )
 
         val exercises = buildList {
@@ -108,10 +100,12 @@ class LlmWorkoutGenerator(
                         add(
                             AiGeneratedExercise(
                                 id = UUID.randomUUID().toString(),
-                                name = item.optString("name").trim().ifBlank { "Упражнение ${index + 1}" },
+                                name = item.optString("name").trim().ifBlank {
+                                    LlmWorkoutMessages.defaultExerciseName(index + 1)
+                                },
                                 description = item.optString("description").trim(),
-                                sets = item.optInt("sets").takeIf { it > 0 } ?: 3,
-                                reps = item.optString("reps").trim().ifBlank { "10-12" }
+                                sets = item.optInt("sets").takeIf { it > 0 } ?: DEFAULT_SETS,
+                                reps = item.optString("reps").trim().ifBlank { DEFAULT_REPS }
                             )
                         )
                     }
@@ -120,10 +114,10 @@ class LlmWorkoutGenerator(
                         add(
                             AiGeneratedExercise(
                                 id = UUID.randomUUID().toString(),
-                                name = item.trim().ifBlank { "Упражнение ${index + 1}" },
-                                description = "Описание не указано",
-                                sets = 3,
-                                reps = "10-12"
+                                name = item.trim().ifBlank { LlmWorkoutMessages.defaultExerciseName(index + 1) },
+                                description = LlmWorkoutMessages.DefaultDescription,
+                                sets = DEFAULT_SETS,
+                                reps = DEFAULT_REPS
                             )
                         )
                     }
@@ -133,12 +127,12 @@ class LlmWorkoutGenerator(
 
         if (exercises.isEmpty()) {
             throw IllegalStateException(
-                "OpenRouter вернул пустой список упражнений. Попробуй еще раз или смени модель."
+                LlmWorkoutMessages.EmptyExercisesList
             )
         }
 
         return GeneratedWorkoutPlan(
-            title = json.optString("title").trim().ifBlank { "AI план тренировки" },
+            title = json.optString("title").trim().ifBlank { LlmWorkoutMessages.DefaultTitle },
             exercises = exercises
         )
     }
@@ -155,27 +149,57 @@ class LlmWorkoutGenerator(
 
         return when (responseCode) {
             HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                "OpenRouter отклонил ключ. Проверь llmApiKey в local.properties."
+                LlmWorkoutMessages.InvalidApiKey
             }
             HttpURLConnection.HTTP_PAYMENT_REQUIRED,
             HttpURLConnection.HTTP_FORBIDDEN -> {
                 if (apiMessage.isNotBlank()) {
-                    "OpenRouter недоступен для текущего аккаунта: $apiMessage"
+                    LlmWorkoutMessages.AccountAccessErrorPrefix + apiMessage
                 } else {
-                    "OpenRouter недоступен для текущего аккаунта или модели. Проверь баланс и модель."
+                    LlmWorkoutMessages.AccountAccessError
                 }
             }
             HttpURLConnection.HTTP_BAD_REQUEST -> {
                 if (apiMessage.isNotBlank()) {
-                    "Ошибка запроса к OpenRouter: $apiMessage"
+                    LlmWorkoutMessages.BadRequestPrefix + apiMessage
                 } else {
-                    "Ошибка запроса к OpenRouter. Проверь модель и параметры запроса."
+                    LlmWorkoutMessages.BadRequest
                 }
             }
-            else -> apiMessage.ifBlank { "Не удалось получить ответ от OpenRouter" }
+            else -> apiMessage.ifBlank { LlmWorkoutMessages.GenericError }
         }
     }
 }
+
+private object LlmWorkoutMessages {
+    const val MissingApiKey = "Не найден ключ OpenRouter. Добавь llmApiKey в local.properties"
+    const val InvalidResponseFormat = "OpenRouter вернул ответ в неожиданном формате. Попробуй еще раз или смени модель."
+    const val MissingExercisesList = "OpenRouter вернул план без списка exercises. Попробуй еще раз или смени модель."
+    const val EmptyExercisesList = "OpenRouter вернул пустой список упражнений. Попробуй еще раз или смени модель."
+    const val DefaultDescription = "Описание не указано"
+    const val DefaultTitle = "AI план тренировки"
+    const val InvalidApiKey = "OpenRouter отклонил ключ. Проверь llmApiKey в local.properties."
+    const val AccountAccessErrorPrefix = "OpenRouter недоступен для текущего аккаунта: "
+    const val AccountAccessError = "OpenRouter недоступен для текущего аккаунта или модели. Проверь баланс и модель."
+    const val BadRequestPrefix = "Ошибка запроса к OpenRouter: "
+    const val BadRequest = "Ошибка запроса к OpenRouter. Проверь модель и параметры запроса."
+    const val GenericError = "Не удалось получить ответ от OpenRouter"
+    const val SystemPrompt = "Ты фитнес-ассистент. Верни только валидный JSON без markdown, без пояснений, без текста до или после JSON. " +
+        "Ответ должен быть строго объектом формата {\"title\": string, \"exercises\": [{\"name\": string, \"description\": string, \"sets\": number, \"reps\": string}]}. " +
+        "Поле exercises обязательно должно быть массивом объектов, а не массивом строк. " +
+        "У каждого упражнения обязательно должны быть все 4 поля: name, description, sets, reps. " +
+        "sets должно быть целым числом от 2 до 5. reps должно быть строкой, например \"10-12\" или \"12\". " +
+        "Все названия и описания только на русском языке. " +
+        "Сгенерируй от 3 до 6 безопасных и реалистичных упражнений по запросу пользователя. " +
+        "Не используй английские слова, если есть русский аналог. " +
+        "Пример корректного формата: {\"title\":\"Тренировка на ягодицы\",\"exercises\":[{\"name\":\"Приседания\",\"description\":\"Держи спину ровно и напрягай ягодицы в верхней точке\",\"sets\":4,\"reps\":\"12\"}]}."
+
+    fun defaultExerciseName(index: Int): String = "Упражнение $index"
+}
+
+private const val REQUEST_TIMEOUT_MILLIS = 30_000
+private const val DEFAULT_SETS = 3
+private const val DEFAULT_REPS = "10-12"
 
 data class GeneratedWorkoutPlan(
     val title: String,

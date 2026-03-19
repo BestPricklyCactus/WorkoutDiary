@@ -88,10 +88,10 @@ class MainActivity : ComponentActivity() {
                             MainScreen(
                                 state = mainState,
                                 store = mainStore,
-                                onNavigateToWorkout = { navController.navigate("workout_process") }
+                                onNavigateToWorkout = { navController.navigate(ScreenRoutes.WorkoutProcess) }
                             )
                         }
-                        composable("workout_process") {
+                        composable(ScreenRoutes.WorkoutProcess) {
                             val selectedExercises = mainState.exercises.filter { it.id in mainState.selectedExerciseIds }
                             val workoutStore = remember { WorkoutStoreImpl(selectedExercises, workoutRepository, scope) }
                             val workoutState by workoutStore.state.collectAsState()
@@ -146,10 +146,18 @@ class MainActivity : ComponentActivity() {
 }
 
 sealed class Screen(val route: String, val labelResId: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    object Main : Screen("main", R.string.nav_label_workout, Icons.Filled.PlayArrow)
-    object History : Screen("history", R.string.nav_label_history, Icons.Filled.History)
-    object Editor : Screen("editor", R.string.nav_label_editor, Icons.Filled.Settings)
-    object AiWorkout : Screen("ai_workout", R.string.nav_label_ai_workout, Icons.Filled.AutoAwesome)
+    object Main : Screen(ScreenRoutes.Main, R.string.nav_label_workout, Icons.Filled.PlayArrow)
+    object History : Screen(ScreenRoutes.History, R.string.nav_label_history, Icons.Filled.History)
+    object Editor : Screen(ScreenRoutes.Editor, R.string.nav_label_editor, Icons.Filled.Settings)
+    object AiWorkout : Screen(ScreenRoutes.AiWorkout, R.string.nav_label_ai_workout, Icons.Filled.AutoAwesome)
+}
+
+object ScreenRoutes {
+    const val Main = "main"
+    const val History = "history"
+    const val Editor = "editor"
+    const val AiWorkout = "ai_workout"
+    const val WorkoutProcess = "workout_process"
 }
 
 val items = listOf(

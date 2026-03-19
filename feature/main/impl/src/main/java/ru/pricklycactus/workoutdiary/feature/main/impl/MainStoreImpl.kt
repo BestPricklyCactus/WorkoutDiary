@@ -40,10 +40,10 @@ class MainStoreImpl(
 
     private fun handleOnClick(action: String) {
         when (action) {
-            "add_exercise" -> updateState {
+            MainStoreKeys.AddExercise -> updateState {
                 it.copy(showAddExerciseForm = true, exerciseName = "", exerciseDescription = "")
             }
-            "show_exercises" -> updateState {
+            MainActions.ShowExercises -> updateState {
                 it.copy(showExercisesList = true, showAddExerciseForm = false)
             }
         }
@@ -52,8 +52,8 @@ class MainStoreImpl(
     private fun handleTextChanged(field: String, text: String) {
         updateState {
             when (field) {
-                "name" -> it.copy(exerciseName = text)
-                "description" -> it.copy(exerciseDescription = text)
+                MainStoreKeys.NameField -> it.copy(exerciseName = text)
+                MainStoreKeys.DescriptionField -> it.copy(exerciseDescription = text)
                 else -> it
             }
         }
@@ -72,4 +72,10 @@ class MainStoreImpl(
             updateState { it.copy(selectedExerciseIds = it.selectedExerciseIds - exerciseIds) }
         }
     }
+}
+
+internal object MainStoreKeys {
+    const val AddExercise = "add_exercise"
+    const val NameField = "name"
+    const val DescriptionField = "description"
 }

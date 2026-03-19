@@ -71,8 +71,8 @@ class EditorStoreImpl(
     private fun handleTextChanged(field: String, text: String) {
         updateState {
             when (field) {
-                "name" -> it.copy(exerciseName = text)
-                "description" -> it.copy(exerciseDescription = text)
+                EditorFieldKeys.Name -> it.copy(exerciseName = text)
+                EditorFieldKeys.Description -> it.copy(exerciseDescription = text)
                 else -> it
             }
         }
@@ -99,4 +99,9 @@ class EditorStoreImpl(
             }
         }
     }
+}
+
+internal object EditorFieldKeys {
+    const val Name = "name"
+    const val Description = "description"
 }

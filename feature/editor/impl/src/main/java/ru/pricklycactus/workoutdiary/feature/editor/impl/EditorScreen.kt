@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import ru.pricklycactus.workoutdiary.feature.common.ExerciseForm
 import ru.pricklycactus.workoutdiary.feature.common.ExercisesList
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorIntent
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorStore
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorViewState
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun EditorScreen(
@@ -28,9 +28,9 @@ fun EditorScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(Dimensions.ScreenPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         Text(
             text = stringResource(R.string.editor_title),
@@ -41,8 +41,8 @@ fun EditorScreen(
             ExerciseForm(
                 exerciseName = state.exerciseName,
                 exerciseDescription = state.exerciseDescription,
-                onNameChange = { store.dispatch(EditorIntent.OnTextChanged("name", it)) },
-                onDescriptionChange = { store.dispatch(EditorIntent.OnTextChanged("description", it)) },
+                onNameChange = { store.dispatch(EditorIntent.OnTextChanged(EditorFieldKeys.Name, it)) },
+                onDescriptionChange = { store.dispatch(EditorIntent.OnTextChanged(EditorFieldKeys.Description, it)) },
                 onSave = { store.dispatch(EditorIntent.SaveExerciseClick) },
                 onCancel = { store.dispatch(EditorIntent.CancelAddExerciseClick) }
             )

@@ -25,8 +25,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutEffect
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseStatus
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutIntent
@@ -70,15 +70,15 @@ fun WorkoutScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(Dimensions.ScreenPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         Text(stringResource(R.string.workout_title), style = MaterialTheme.typography.headlineMedium)
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
         ) {
             items(state.exercises, key = { it.exercise.id }) { exerciseState ->
                 ExerciseItem(
@@ -124,8 +124,8 @@ private fun ExerciseItem(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(Dimensions.CardPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.CardContentSpacing)
         ) {
             Text(
                 text = exerciseState.exercise.name,

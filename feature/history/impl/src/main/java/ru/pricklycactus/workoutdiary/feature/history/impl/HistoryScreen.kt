@@ -13,9 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryStore
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryViewState
+import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -28,8 +28,8 @@ fun HistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(Dimensions.ScreenPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.ColumnSpacing)
     ) {
         Text(
             text = stringResource(R.string.history_title),
@@ -46,13 +46,13 @@ fun HistoryScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
             ) {
                 items(state.workouts, key = { it.workoutDate }) { workout ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.padding(Dimensions.CardPadding),
+                            verticalArrangement = Arrangement.spacedBy(Dimensions.CardContentSpacing)
                         ) {
                             Text(
                                 text = formatWorkoutDate(workout.workoutDate),
