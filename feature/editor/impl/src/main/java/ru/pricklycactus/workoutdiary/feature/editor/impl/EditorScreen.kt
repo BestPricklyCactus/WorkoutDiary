@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 import ru.pricklycactus.workoutdiary.feature.common.ExerciseForm
 import ru.pricklycactus.workoutdiary.feature.common.ExercisesList
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorIntent
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorStore
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorViewState
-import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun EditorScreen(

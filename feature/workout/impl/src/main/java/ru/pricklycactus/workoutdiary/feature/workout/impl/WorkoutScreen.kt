@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.flow.collectLatest
-import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
+import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutEffect
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseStatus
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutIntent

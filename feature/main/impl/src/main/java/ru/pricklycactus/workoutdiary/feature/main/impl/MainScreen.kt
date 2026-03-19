@@ -2,7 +2,6 @@ package ru.pricklycactus.workoutdiary.feature.main.impl
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,12 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.flow.collectLatest
+import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 import ru.pricklycactus.workoutdiary.feature.common.ExercisesList
 import ru.pricklycactus.workoutdiary.feature.main.api.MainEffect
 import ru.pricklycactus.workoutdiary.feature.main.api.MainIntent
 import ru.pricklycactus.workoutdiary.feature.main.api.MainStore
 import ru.pricklycactus.workoutdiary.feature.main.api.MainViewState
-import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 
 @Composable
 fun MainScreen(

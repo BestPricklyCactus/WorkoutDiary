@@ -18,6 +18,7 @@ android {
 dependencies {
     implementation(project(":core:mvi"))
     implementation(project(":feature:history:api"))
+    implementation(project(":feature:common"))
     implementation(project(":data"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

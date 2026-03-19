@@ -13,9 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryStore
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryViewState
-import ru.pricklycactus.workoutdiary.ui.theme.Dimensions
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

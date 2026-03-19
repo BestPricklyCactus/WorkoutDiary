@@ -39,6 +39,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(project(":feature:aiworkout:api"))
+    implementation(project(":feature:common"))
     implementation(project(":data"))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
