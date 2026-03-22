@@ -91,7 +91,10 @@ pipeline {
 
         stage('Performance Profiling') {
             when {
-                triggeredBy 'TimerTrigger'
+                anyOf {
+                    environment name: 'BRANCH_NAME', value: 'test' //TODO: удалить, добавлено для теста
+                    triggeredBy 'TimerTrigger'
+                }
             }
             steps {
                 echo 'Running Gradle Profiler...'
