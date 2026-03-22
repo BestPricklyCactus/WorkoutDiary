@@ -92,7 +92,7 @@ pipeline {
         stage('Performance Profiling') {
             when {
                 anyOf {
-                    environment name: 'BRANCH_NAME', value: 'test' //TODO: удалить, добавлено для теста
+                    environment name: 'BRANCH_NAME', value: 'feature/test' //TODO: удалить, добавлено для теста
                     triggeredBy 'TimerTrigger'
                 }
             }
