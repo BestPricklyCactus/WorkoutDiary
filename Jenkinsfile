@@ -36,7 +36,7 @@ pipeline {
                 anyOf {
                     branch 'feature/*'
                     changeRequest()
-                    trigger 'TimerTrigger'
+                    triggeredBy 'TimerTrigger'
                 }
             }
             steps {
@@ -53,9 +53,7 @@ pipeline {
 
         stage('Unit Tests') {
             when {
-                // Skip unit tests in nightly run to save time,
-                // as they are usually covered by regular builds
-                not { trigger 'TimerTrigger' }
+                not { triggeredBy 'TimerTrigger' }
             }
             steps {
                 echo 'Running Unit Tests...'
@@ -72,9 +70,8 @@ pipeline {
             when {
                 anyOf {
                     branch 'main'
-                    branch 'origin/main'
-                    branch 'origin/develop'
-                    branch 'origin/feature/*'
+                    branch 'develop'
+                    branch 'feature/*'
                     changeRequest()
                 }
             }
