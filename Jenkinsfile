@@ -45,11 +45,15 @@ pipeline {
             steps {
                 echo 'Running Lint...'
                 sh './gradlew lintDebug'
+                echo 'Running Detekt...'
+                sh './gradlew detekt'
             }
             post {
                 always {
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.xml', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.html', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/detekt/*.xml', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/detekt/*.html', allowEmptyArchive: true
                 }
             }
         }
