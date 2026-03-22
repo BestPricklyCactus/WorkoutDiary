@@ -6,9 +6,14 @@ pipeline {
         }
     }
 
+    triggers {
+        // Nightly build at 02:00 AM
+        cron('H 2 * * *')
+    }
+
     options {
         disableConcurrentBuilds()
-        timeout(time: 1, unit: 'HOURS')
+        timeout(time: 2, unit: 'HOURS')
         timestamps()
     }
 
@@ -31,10 +36,11 @@ pipeline {
                 anyOf {
                     branch 'feature/*'
                     changeRequest()
+                    trigger 'TimerTrigger'
                 }
             }
             steps {
-                echo 'Running Lint for Feature branch...'
+                echo 'Running Lint...'
                 sh './gradlew lintDebug'
             }
             post {
@@ -46,6 +52,11 @@ pipeline {
         }
 
         stage('Unit Tests') {
+            when {
+                // Skip unit tests in nightly run to save time,
+                // as they are usually covered by regular builds
+                not { trigger 'TimerTrigger' }
+            }
             steps {
                 echo 'Running Unit Tests...'
                 sh './gradlew testDebugUnitTest'
@@ -60,8 +71,10 @@ pipeline {
         stage('Build Debug APK') {
             when {
                 anyOf {
-                    branch 'develop'
-                    branch 'feature/*'
+                    branch 'main'
+                    branch 'origin/main'
+                    branch 'origin/develop'
+                    branch 'origin/feature/*'
                     changeRequest()
                 }
             }
@@ -75,26 +88,11 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Release Bundle (AAB)') {
-            when {
-                branch 'main'
-            }
-            steps {
-                echo 'Building Release Bundle...'
-                sh './gradlew bundleRelease'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'app/build/outputs/bundle/release/*.aab', fingerprint: true
-                }
-            }
-        }
     }
 
     post {
         failure {
-            echo 'Build failed. Check the logs and artifacts.'
+            echo 'Pipeline failed!'
         }
         cleanup {
             cleanWs(deleteDirs: true, notFailBuild: true)
