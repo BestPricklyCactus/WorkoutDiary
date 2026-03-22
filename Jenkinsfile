@@ -34,6 +34,9 @@ pipeline {
         stage('Lint & Static Analysis') {
             when {
                 anyOf {
+                    environment name: 'BRANCH_NAME', value: 'feature/*'
+                    environment name: 'BRANCH_NAME', value: 'develop'
+                    environment name: 'BRANCH_NAME', value: 'main'
                     branch 'feature/*'
                     changeRequest()
                     triggeredBy 'TimerTrigger'
@@ -69,9 +72,9 @@ pipeline {
         stage('Build Debug APK') {
             when {
                 anyOf {
-                    branch 'main'
-                    branch 'develop'
-                    branch 'feature/*'
+                    environment name: 'BRANCH_NAME', value: 'main'
+                    environment name: 'BRANCH_NAME', value: 'develop'
+                    environment name: 'BRANCH_NAME', value: 'feature/*'
                     changeRequest()
                 }
             }
