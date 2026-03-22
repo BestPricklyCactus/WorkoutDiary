@@ -7,8 +7,8 @@ pipeline {
     }
 
     triggers {
-        // Nightly build at 02:00 AM
-        cron('H 2 * * *')
+        // Nightly build at 00:00 AM
+        cron('H 0 * * *')
     }
 
     options {
@@ -85,6 +85,30 @@ pipeline {
             post {
                 success {
                     archiveArtifacts artifacts: 'app/build/outputs/apk/debug/*.apk', fingerprint: true
+                }
+            }
+        }
+
+        stage('Performance Profiling') {
+            when {
+                trigger 'TimerTrigger' // Only run during nightly builds
+            }
+            steps {
+                echo 'Running Gradle Profiler...'
+                sh '''
+                    # Install gradle-profiler if not present
+                    if [ ! -f "./gradle-profiler" ]; then
+                        curl -L -o gradle-profiler.zip https://github.com/gradle/gradle-profiler/releases/latest/download/gradle-profiler.zip
+                        unzip gradle-profiler.zip
+                    fi
+
+                    # Run profiler
+                    ./gradle-profiler --scenario ./build-scenario.profile --output-dir ./profiler-results
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'profiler-results/**/*', allowEmptyArchive: true
                 }
             }
         }
