@@ -88,7 +88,7 @@ pipeline {
 
         stage('Performance Profiling') {
             when {
-                trigger 'TimerTrigger' // Only run during nightly builds
+                triggeredBy 'TimerTrigger'
             }
             steps {
                 echo 'Running Gradle Profiler...'
