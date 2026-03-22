@@ -1,7 +1,7 @@
 package ru.pricklycactus.workoutdiary.feature.workout.api
 
 import ru.pricklycactus.workoutdiary.core.mvi.MviState
-import ru.pricklycactus.workoutdiary.data.database.Exercise
+import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
 
 data class WorkoutViewState(
     val exercises: List<WorkoutExerciseState> = emptyList(),
@@ -11,7 +11,7 @@ data class WorkoutViewState(
 ) : MviState
 
 data class WorkoutExerciseState(
-    val exercise: Exercise,
+    val exercise: ExerciseDomain,
     val status: WorkoutExerciseStatus = WorkoutExerciseStatus.IDLE,
     val sets: Int = 0,
     val reps: Int = 0,

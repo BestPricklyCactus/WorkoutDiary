@@ -3,8 +3,8 @@ package ru.pricklycactus.workoutdiary.feature.workout.impl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.core.mvi.MviStore
-import ru.pricklycactus.workoutdiary.data.database.Exercise
-import ru.pricklycactus.workoutdiary.data.database.Workout
+import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
+import ru.pricklycactus.workoutdiary.data.domain.WorkoutDomain
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutEffect
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseStatus
@@ -14,7 +14,7 @@ import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutViewState
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseState
 
 class WorkoutStoreImpl(
-    selectedExercises: List<Exercise>,
+    selectedExercises: List<ExerciseDomain>,
     private val repository: WorkoutRepository,
     scope: CoroutineScope
 ) : MviStore<WorkoutViewState, WorkoutIntent, WorkoutEffect>(
@@ -109,11 +109,11 @@ class WorkoutStoreImpl(
         val workouts = currentState.exercises
             .filter { it.status == WorkoutExerciseStatus.COMPLETED }
             .map { exerciseState ->
-                Workout(
+                WorkoutDomain(
                     exerciseId = exerciseState.exercise.id,
                     reps = exerciseState.reps,
                     sets = exerciseState.sets,
-                    workoutDate = finishedAt,
+                    date = finishedAt,
                     totalDurationMillis = finishedAt - currentState.workoutStartedAtMillis,
                     exerciseDurationMillis = exerciseState.durationMillis ?: 0L
                 )

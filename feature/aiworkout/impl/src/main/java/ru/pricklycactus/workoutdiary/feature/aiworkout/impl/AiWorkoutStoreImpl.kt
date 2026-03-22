@@ -3,7 +3,7 @@ package ru.pricklycactus.workoutdiary.feature.aiworkout.impl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.core.mvi.MviStore
-import ru.pricklycactus.workoutdiary.data.database.Exercise
+import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiGeneratedExercise
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiWorkoutEffect
@@ -65,7 +65,7 @@ class AiWorkoutStoreImpl(
         val exercise = currentState.generatedExercises.firstOrNull { it.id == exerciseId } ?: return
 
         scope.launch {
-            repository.upsertExercise(exercise.toDatabaseExercise())
+            repository.upsertExercise(exercise.toDomainExercise())
             updateState { state ->
                 state.copy(
                     generatedExercises = state.generatedExercises.map {
@@ -85,7 +85,7 @@ class AiWorkoutStoreImpl(
         }
 
         scope.launch {
-            exercisesToSave.forEach { repository.upsertExercise(it.toDatabaseExercise()) }
+            exercisesToSave.forEach { repository.upsertExercise(it.toDomainExercise()) }
             updateState { state ->
                 state.copy(generatedExercises = state.generatedExercises.map { it.copy(isSaved = true) })
             }
@@ -93,7 +93,7 @@ class AiWorkoutStoreImpl(
         }
     }
 
-    private fun AiGeneratedExercise.toDatabaseExercise(): Exercise {
+    private fun AiGeneratedExercise.toDomainExercise(): ExerciseDomain {
         val details = buildString {
             append(description)
             append("\n\nПодходы: ")
@@ -101,7 +101,7 @@ class AiWorkoutStoreImpl(
             append("\nПовторения: ")
             append(reps)
         }
-        return Exercise(name = name, description = details)
+        return ExerciseDomain(name = name, description = details)
     }
 
 }

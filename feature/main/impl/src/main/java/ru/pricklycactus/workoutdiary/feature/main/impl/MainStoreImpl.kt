@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.core.mvi.MviStore
-import ru.pricklycactus.workoutdiary.data.database.Exercise
+import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.main.api.MainEffect
 import ru.pricklycactus.workoutdiary.feature.main.api.MainIntent

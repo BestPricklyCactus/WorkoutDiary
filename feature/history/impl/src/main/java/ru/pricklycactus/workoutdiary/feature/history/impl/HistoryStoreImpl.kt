@@ -31,7 +31,7 @@ class HistoryStoreImpl(
         scope.launch {
             repository.getWorkoutsWithExercises().collectLatest { workouts ->
                 val grouped = workouts
-                    .groupBy { it.workout.workoutDate }
+                    .groupBy { it.workout.date }
                     .toSortedMap(compareByDescending { it })
                     .map { (workoutDate, entries) ->
                         WorkoutHistoryEntry(
