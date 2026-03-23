@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    // alias(libs.plugins.kotlin.android) - Removed to fix double applying error
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "ru.pricklycactus.workoutdiary.feature.history.impl"
+    namespace = "ru.pricklycactus.workoutdiary.feature.report.impl"
     compileSdk = 36
     defaultConfig { minSdk = 24 }
     compileOptions {
@@ -17,7 +16,7 @@ android {
 
 dependencies {
     implementation(project(":core:mvi"))
-    implementation(project(":feature:history:api"))
+    implementation(project(":feature:report:api"))
     implementation(project(":feature:common"))
     implementation(project(":data"))
     implementation(platform(libs.androidx.compose.bom))

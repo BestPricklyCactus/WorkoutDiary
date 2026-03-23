@@ -1,0 +1,16 @@
+<resources>
+    <string name="report_title" translatable="false">Отчет</string>
+    <string name="report_hide" translatable="false">Скрыть отчет</string>
+    <string name="report_share" translatable="false">Поделиться</string>
+    <string name="report_empty" translatable="false">Нет данных за выбранный период</string>
+    <string name="report_start_date" translatable="false">С: %s</string>
+    <string name="report_end_date" translatable="false">По: %s</string>
+    <string name="report_select_date" translatable="false">выбрать дату</string>
+    <string name="report_exercise_header" translatable="false">Упражнение</string>
+    <string name="report_saved_to_downloads" translatable="false">Отчет сохранен в Downloads</string>
+    <string name="report_period_week" translatable="false">Неделя</string>
+    <string name="report_period_month" translatable="false">Месяц</string>
+    <string name="report_period_three_months" translatable="false">3 месяца</string>
+    <string name="report_period_half_year" translatable="false">Полгода</string>
+    <string name="report_period_custom" translatable="false">Задать вручную</string>
+</resources>
