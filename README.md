@@ -36,14 +36,22 @@ Android-приложение для ведения дневника тренир
 
 ## Скриншоты
 
-![Главный экран](screenshots/Screenshot%202026-03-23%20143635.png)
-![История тренировок](screenshots/Screenshot_20260323_144609.png)
-![Редактор упражнений](screenshots/Screenshot_20260323_144824.png)
-![Список упражнений](screenshots/Screenshot_20260323_144857.png)
-![Экран тренировки](screenshots/Screenshot_20260323_144916.png)
-![AI тренировка](screenshots/Screenshot_20260323_144926.png)
-![AI результат](screenshots/Screenshot_20260323_144938.png)
-![Дополнительный экран](screenshots/Screenshot_20260323_144953.png)
+<p align="center">
+  <img src="screenshots/Screenshot%202026-03-23%20143635.png" alt="Главный экран" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144609.png" alt="История тренировок" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144824.png" alt="Редактор упражнений" width="30%" />
+</p>
+
+<p align="center">
+  <img src="screenshots/Screenshot_20260323_144857.png" alt="Список упражнений" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144916.png" alt="Экран тренировки" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144926.png" alt="AI тренировка" width="30%" />
+</p>
+
+<p align="center">
+  <img src="screenshots/Screenshot_20260323_144938.png" alt="AI результат" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144953.png" alt="Дополнительный экран" width="30%" />
+</p>
 
 ## Технологии
 
