@@ -90,8 +90,21 @@ abstract class RuStorePublishTask : DefaultTask() {
         logger.lifecycle("Publishing ${resolvedArtifactFile.name} to RuStore for ${packageName.get()}")
 
         val publicToken = createPublicToken()
-        val versionId = createDraft(publicToken)
-        uploadArtifact(publicToken, versionId, resolvedArtifactFile)
+        deleteExistingDrafts(publicToken)
+        var versionId = createDraft(publicToken)
+        try {
+            uploadArtifact(publicToken, versionId, resolvedArtifactFile)
+        } catch (e: GradleException) {
+            val message = e.message.orEmpty()
+            if (message.contains("There can be only one main APK file", ignoreCase = true)) {
+                logger.lifecycle("RuStore reports existing main artifact in draft $versionId. Recreating draft and retrying upload.")
+                deleteDraft(publicToken, versionId)
+                versionId = createDraft(publicToken)
+                uploadArtifact(publicToken, versionId, resolvedArtifactFile)
+            } else {
+                throw e
+            }
+        }
         if (publishType.get() != RuStorePublishType.MANUAL) {
             updatePublishSettings(publicToken, versionId)
         }
@@ -223,6 +236,32 @@ abstract class RuStorePublishTask : DefaultTask() {
                 throw e
             }
         }
+    }
+
+    private fun deleteExistingDrafts(publicToken: String) {
+        val response = requestJson(
+            method = "GET",
+            url = "$rustoreApiHost/public/v1/application/${encodePath(packageName.get())}/version?versionStatuses=DRAFT&page=0&size=100",
+            token = publicToken
+        )
+
+        val body = response["body"] as? Map<*, *> ?: return
+        val content = body["content"] as? List<*> ?: return
+        content.mapNotNull { item ->
+            val map = item as? Map<*, *> ?: return@mapNotNull null
+            (map["versionId"] as? Number)?.toLong()
+        }.forEach { draftId ->
+            logger.lifecycle("Deleting existing RuStore draft $draftId before new publish")
+            deleteDraft(publicToken, draftId)
+        }
+    }
+
+    private fun deleteDraft(publicToken: String, versionId: Long) {
+        requestJson(
+            method = "DELETE",
+            url = "$rustoreApiHost/public/v1/application/${encodePath(packageName.get())}/version/$versionId",
+            token = publicToken
+        )
     }
 
     private fun uploadArtifact(publicToken: String, versionId: Long, file: File) {
