@@ -1,0 +1,72 @@
+@startuml
+title WorkoutDiary - Архитектура проекта
+
+skinparam backgroundColor white
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+package "app" {
+  [MainActivity]
+  [Navigation]
+  [DI / AppComponent]
+}
+
+package "core:mvi" {
+  [MviStore]
+  [MviState]
+  [MviIntent]
+  [MviEffect]
+}
+
+package "feature:*" {
+  [main]
+  [editor]
+  [history]
+  [report]
+  [workout]
+  [aiworkout]
+}
+
+package "data" {
+  [WorkoutRepository]
+  [DAO]
+  [Domain Mappers]
+  [Room Database]
+}
+
+package "External Services" {
+  [OpenRouter]
+  [RuStore API]
+}
+
+[MainActivity] --> [Navigation]
+[MainActivity] --> [DI / AppComponent]
+[Navigation] --> [main]
+[Navigation] --> [editor]
+[Navigation] --> [history]
+[Navigation] --> [report]
+[Navigation] --> [workout]
+[Navigation] --> [aiworkout]
+
+[main] --> [MviStore]
+[editor] --> [MviStore]
+[history] --> [MviStore]
+[report] --> [MviStore]
+[workout] --> [MviStore]
+[aiworkout] --> [MviStore]
+
+[main] --> [WorkoutRepository]
+[editor] --> [WorkoutRepository]
+[history] --> [WorkoutRepository]
+[report] --> [WorkoutRepository]
+[workout] --> [WorkoutRepository]
+[aiworkout] --> [WorkoutRepository]
+
+[WorkoutRepository] --> [DAO]
+[WorkoutRepository] --> [Domain Mappers]
+[DAO] --> [Room Database]
+[WorkoutRepository] --> [OpenRouter]
+[WorkoutRepository] --> [RuStore API]
+
+@enduml

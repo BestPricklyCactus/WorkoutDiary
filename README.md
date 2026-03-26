@@ -26,6 +26,12 @@ Android-приложение для ведения дневника тренир
 - настроена публикация в RuStore через Gradle task `publishToRuStore`;
 - добавлена release-подпись сборки через параметры из `local.properties`.
 
+### Версия 1.1
+
+- `versionName`: `1.1`
+- `versionCode`: `11`
+- Добавлена фича "Формирование отчета за заданный период"
+
 ### Шаблон для следующей версии
 
 ### Версия X.Y
@@ -57,10 +63,64 @@ Android-приложение для ведения дневника тренир
 
 - Kotlin
 - Jetpack Compose
-- ViewModel
 - Room
 - MVI
 - OpenRouter API
+
+## Архитектура
+
+Проект построен как многомодульное Android-приложение с feature-first структурой и MVI-подходом для presentation слоя.
+
+Основные принципы:
+
+- `app` отвечает за DI, навигацию и связывание feature-модулей;
+- каждая фича вынесена в отдельные модули `api` и `impl`;
+- состояние экрана хранится в `Store` (`MviStore`), UI только отображает `State` и отправляет `Intent`;
+- доступ к данным идет через `WorkoutRepository`;
+- локальное хранение реализовано через `Room` (`DAO -> repository -> domain models`);
+- внешняя AI-интеграция вынесена в отдельную feature `aiworkout`.
+
+### Структура модулей
+
+```text
+app/
+core/mvi/
+data/
+feature/
+├── aiworkout/
+├── common/
+├── editor/
+├── history/
+├── main/
+├── report/
+└── workout/
+```
+
+### Схема взаимодействия
+
+![Схема взаимодействия](docs/uml/interaction_diagram.png)
+
+Исходник PlantUML: `docs/uml/interaction_diagram.puml`
+
+### Общая схема архитектуры
+
+![Общая схема архитектуры](docs/uml/architecture_diagram.png)
+
+Исходник PlantUML: `docs/uml/architecture_diagram.puml`
+
+### Поток данных внутри фичи
+
+![Поток данных внутри фичи](docs/uml/feature_data_flow.png)
+
+Исходник PlantUML: `docs/uml/feature_data_flow.puml`
+
+
+### Преимущества
+
+- легко изолировать и развивать независимо фичи;
+- удобно тестировать бизнес-логику на уровне store/repository;
+- UI остается тонким и предсказуемым;
+- навигация и зависимости централизованы в `app`.
 
 ## OpenRouter
 
@@ -95,80 +155,10 @@ llmModel=meta-llama/llama-3.1-8b-instruct
 
 ## RuStore API
 
-Для публикации в RuStore добавлен конфиг `rustorePublishing` в `app/build.gradle.kts` и task `publishToRuStore`.
-
-Пример конфигурации через Gradle properties:
-
-```properties
-rustoreKeyId=123456
-rustorePrivateKey=BASE64_PRIVATE_KEY
-rustoreArtifactType=AAB
-rustoreAppType=MAIN
-rustoreCategory=health
-rustoreMinAndroidVersion=8
-rustoreDeveloperEmail=Masha_9595@mail.ru
-rustoreDeveloperWebsite=
-rustoreDeveloperVkCommunity=
-rustorePublishType=MANUAL
-rustorePartialValue=100
-rustoreReleaseNotes=Сборка из CI
-rustorePriorityUpdate=0
-```
-
-Доступные параметры:
-
-- `rustoreKeyId` - ID ключа из RuStore Console
-- `rustorePrivateKey` - приватный ключ из RuStore Console
-- `rustoreArtifactType` - `AAB` или `APK`
-- `rustoreAppType` - `MAIN` или `GAMES`
-- `rustoreCategory` - категория приложения, например `health`
-- `rustoreMinAndroidVersion` - минимальная версия Android
-- `rustoreDeveloperEmail` - email разработчика
-- `rustoreDeveloperWebsite` - сайт разработчика, опционально
-- `rustoreDeveloperVkCommunity` - ссылка на VK-сообщество, опционально
-- `rustorePublishType` - `MANUAL`, `INSTANTLY` или `DELAYED`
-- `rustorePartialValue` - процент публикации: `5`, `10`, `25`, `50`, `75`, `100`
-- `rustoreReleaseNotes` - описание `Что нового`
-- `rustorePriorityUpdate` - приоритет обновления от `0` до `5`
-
 Gradle task для публикации:
 
 ```bash
 ./gradlew publishToRuStore
 ```
 
-Что нужно настроить в RuStore:
 
-1. Открыть `https://console.rustore.ru/`
-2. Сгенерировать ключ в разделе `API RuStore`
-3. Скопировать `keyId` и приватный ключ
-4. Убедиться, что у ключа есть доступ к методам публикации приложений
-5. Добавить значения в `local.properties` или передавать как Gradle properties в CI
-
-Важно:
-
-- для работы API должна существовать хотя бы одна активная версия приложения в RuStore
-- релизная сборка должна быть подписана
-- приватный ключ нельзя коммитить в репозиторий
-
-## Подпись release
-
-Для release-сборки проект читает данные подписи из `local.properties` или из Gradle properties/CI-переменных.
-
-Добавь в `local.properties`:
-
-```properties
-releaseStoreFile=keystore/release.keystore
-releaseStorePassword=YOUR_STORE_PASSWORD
-releaseKeyAlias=YOUR_KEY_ALIAS
-releaseKeyPassword=YOUR_KEY_PASSWORD
-```
-
-Пояснение:
-
-- `releaseStoreFile` - путь до keystore относительно корня проекта
-- `releaseStorePassword` - пароль от keystore
-- `releaseKeyAlias` - alias ключа внутри keystore
-- `releaseKeyPassword` - пароль от ключа
-
-Если подпись не настроена, `publishToRuStore` завершится с понятной ошибкой до начала публикации.

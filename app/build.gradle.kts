@@ -1,9 +1,4 @@
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.TaskAction
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -36,8 +31,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
 }
-
-private val defaultReleaseDname = "CN=WorkoutDiary, OU=Mobile, O=BestPricklyCactus, L=Moscow, ST=Moscow, C=RU"
 
 android {
     namespace = "ru.pricklycactus.workoutdiary"
