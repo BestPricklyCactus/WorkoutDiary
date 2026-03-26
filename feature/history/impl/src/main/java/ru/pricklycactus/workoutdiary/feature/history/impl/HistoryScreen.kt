@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.pricklycactus.workoutdiary.feature.common.Dimensions
+import ru.pricklycactus.workoutdiary.feature.history.api.HistoryIntent
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryStore
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryViewState
 import java.text.SimpleDateFormat
@@ -23,7 +25,8 @@ import java.util.Locale
 @Composable
 fun HistoryScreen(
     state: HistoryViewState,
-    store: HistoryStore
+    store: HistoryStore,
+    onNavigateToReport: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -35,6 +38,13 @@ fun HistoryScreen(
             text = stringResource(R.string.history_title),
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Button(
+            onClick = onNavigateToReport,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.history_show_report))
+        }
 
         if (state.workouts.isEmpty()) {
             Text(

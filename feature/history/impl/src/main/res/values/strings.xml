@@ -3,4 +3,5 @@
     <string name="history_empty" translatable="false">История пока пуста</string>
     <string name="history_total_time" translatable="false">Общее время: %s</string>
     <string name="history_exercise_format" translatable="false">%1$s: %2$d x %3$d</string>
+    <string name="history_show_report" translatable="false">Показать отчет</string>
 </resources>

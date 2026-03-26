@@ -33,6 +33,8 @@ import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryScreen
 import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryStoreImpl
 import ru.pricklycactus.workoutdiary.feature.main.impl.MainScreen
 import ru.pricklycactus.workoutdiary.feature.main.impl.MainStoreImpl
+import ru.pricklycactus.workoutdiary.feature.report.impl.ReportScreen
+import ru.pricklycactus.workoutdiary.feature.report.impl.ReportStoreImpl
 import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutScreen
 import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutStoreImpl
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
@@ -108,7 +110,18 @@ class MainActivity : ComponentActivity() {
 
                             HistoryScreen(
                                 state = historyState,
-                                store = historyStore
+                                store = historyStore,
+                                onNavigateToReport = { navController.navigate(ScreenRoutes.Report) }
+                            )
+                        }
+                        composable(ScreenRoutes.Report) {
+                            val reportStore = remember { ReportStoreImpl(workoutRepository, scope) }
+                            val reportState by reportStore.state.collectAsState()
+
+                            ReportScreen(
+                                state = reportState,
+                                store = reportStore,
+                                onBack = { navController.popBackStack() }
                             )
                         }
                         composable(Screen.Editor.route) {
@@ -158,6 +171,7 @@ object ScreenRoutes {
     const val Editor = "editor"
     const val AiWorkout = "ai_workout"
     const val WorkoutProcess = "workout_process"
+    const val Report = "report"
 }
 
 val items = listOf(

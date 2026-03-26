@@ -210,6 +210,8 @@ dependencies {
     implementation(project(":feature:editor:impl"))
     implementation(project(":feature:history:api"))
     implementation(project(":feature:history:impl"))
+    implementation(project(":feature:report:api"))
+    implementation(project(":feature:report:impl"))
     implementation(project(":feature:workout:api"))
     implementation(project(":feature:workout:impl"))
     implementation(project(":feature:aiworkout:api"))
