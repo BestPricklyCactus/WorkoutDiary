@@ -104,7 +104,7 @@ rustoreKeyId=123456
 rustorePrivateKey=BASE64_PRIVATE_KEY
 rustoreArtifactType=AAB
 rustoreAppType=MAIN
-rustoreCategories=health,fitness
+rustoreCategory=health
 rustoreMinAndroidVersion=8
 rustoreDeveloperEmail=Masha_9595@mail.ru
 rustoreDeveloperWebsite=
@@ -121,7 +121,7 @@ rustorePriorityUpdate=0
 - `rustorePrivateKey` - приватный ключ из RuStore Console
 - `rustoreArtifactType` - `AAB` или `APK`
 - `rustoreAppType` - `MAIN` или `GAMES`
-- `rustoreCategories` - список категорий через запятую
+- `rustoreCategory` - категория приложения, например `health`
 - `rustoreMinAndroidVersion` - минимальная версия Android
 - `rustoreDeveloperEmail` - email разработчика
 - `rustoreDeveloperWebsite` - сайт разработчика, опционально

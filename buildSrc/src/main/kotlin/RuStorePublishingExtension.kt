@@ -23,7 +23,7 @@ abstract class RuStorePublishingExtension @Inject constructor(
     val keyId: Property<String> = objects.property(String::class.java)
     val privateKey: Property<String> = objects.property(String::class.java)
     val appType: Property<String> = objects.property(String::class.java)
-    val categories: ListProperty<String> = objects.listProperty(String::class.java)
+    val category: Property<String> = objects.property(String::class.java)
     val minAndroidVersion: Property<String> = objects.property(String::class.java)
     val developerEmail: Property<String> = objects.property(String::class.java)
     val developerWebsite: Property<String> = objects.property(String::class.java)
