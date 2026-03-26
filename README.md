@@ -14,6 +14,45 @@ Android-приложение для ведения дневника тренир
 - просматривать историю тренировок с датой, списком упражнений и общим временем;
 - генерировать тренировку через AI и сохранять предложенные упражнения в локальную базу.
 
+## Release Notes
+
+### Версия 1.0
+
+- `versionName`: `1.0`
+- `versionCode`: `1`
+
+- добавлены экран тренировки и сохранение истории занятий;
+- добавлена AI-генерация тренировок через OpenRouter;
+- настроена публикация в RuStore через Gradle task `publishToRuStore`;
+- добавлена release-подпись сборки через параметры из `local.properties`.
+
+### Шаблон для следующей версии
+
+### Версия X.Y
+
+- `versionName`: `X.Y`
+- `versionCode`: `N`
+- описание изменений...
+
+## Скриншоты
+
+<p align="center">
+  <img src="screenshots/Screenshot%202026-03-23%20143635.png" alt="Главный экран" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144609.png" alt="История тренировок" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144824.png" alt="Редактор упражнений" width="30%" />
+</p>
+
+<p align="center">
+  <img src="screenshots/Screenshot_20260323_144857.png" alt="Список упражнений" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144916.png" alt="Экран тренировки" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144926.png" alt="AI тренировка" width="30%" />
+</p>
+
+<p align="center">
+  <img src="screenshots/Screenshot_20260323_144938.png" alt="AI результат" width="30%" />
+  <img src="screenshots/Screenshot_20260323_144953.png" alt="Дополнительный экран" width="30%" />
+</p>
+
 ## Технологии
 
 - Kotlin
@@ -53,3 +92,83 @@ llmModel=meta-llama/llama-3.1-8b-instruct
 - не добавляй `local.properties` в git
 - не публикуй API key в репозитории
 - если ключ скомпрометирован, удали его в OpenRouter и создай новый
+
+## RuStore API
+
+Для публикации в RuStore добавлен конфиг `rustorePublishing` в `app/build.gradle.kts` и task `publishToRuStore`.
+
+Пример конфигурации через Gradle properties:
+
+```properties
+rustoreKeyId=123456
+rustorePrivateKey=BASE64_PRIVATE_KEY
+rustoreArtifactType=AAB
+rustoreAppType=MAIN
+rustoreCategory=health
+rustoreMinAndroidVersion=8
+rustoreDeveloperEmail=Masha_9595@mail.ru
+rustoreDeveloperWebsite=
+rustoreDeveloperVkCommunity=
+rustorePublishType=MANUAL
+rustorePartialValue=100
+rustoreReleaseNotes=Сборка из CI
+rustorePriorityUpdate=0
+```
+
+Доступные параметры:
+
+- `rustoreKeyId` - ID ключа из RuStore Console
+- `rustorePrivateKey` - приватный ключ из RuStore Console
+- `rustoreArtifactType` - `AAB` или `APK`
+- `rustoreAppType` - `MAIN` или `GAMES`
+- `rustoreCategory` - категория приложения, например `health`
+- `rustoreMinAndroidVersion` - минимальная версия Android
+- `rustoreDeveloperEmail` - email разработчика
+- `rustoreDeveloperWebsite` - сайт разработчика, опционально
+- `rustoreDeveloperVkCommunity` - ссылка на VK-сообщество, опционально
+- `rustorePublishType` - `MANUAL`, `INSTANTLY` или `DELAYED`
+- `rustorePartialValue` - процент публикации: `5`, `10`, `25`, `50`, `75`, `100`
+- `rustoreReleaseNotes` - описание `Что нового`
+- `rustorePriorityUpdate` - приоритет обновления от `0` до `5`
+
+Gradle task для публикации:
+
+```bash
+./gradlew publishToRuStore
+```
+
+Что нужно настроить в RuStore:
+
+1. Открыть `https://console.rustore.ru/`
+2. Сгенерировать ключ в разделе `API RuStore`
+3. Скопировать `keyId` и приватный ключ
+4. Убедиться, что у ключа есть доступ к методам публикации приложений
+5. Добавить значения в `local.properties` или передавать как Gradle properties в CI
+
+Важно:
+
+- для работы API должна существовать хотя бы одна активная версия приложения в RuStore
+- релизная сборка должна быть подписана
+- приватный ключ нельзя коммитить в репозиторий
+
+## Подпись release
+
+Для release-сборки проект читает данные подписи из `local.properties` или из Gradle properties/CI-переменных.
+
+Добавь в `local.properties`:
+
+```properties
+releaseStoreFile=keystore/release.keystore
+releaseStorePassword=YOUR_STORE_PASSWORD
+releaseKeyAlias=YOUR_KEY_ALIAS
+releaseKeyPassword=YOUR_KEY_PASSWORD
+```
+
+Пояснение:
+
+- `releaseStoreFile` - путь до keystore относительно корня проекта
+- `releaseStorePassword` - пароль от keystore
+- `releaseKeyAlias` - alias ключа внутри keystore
+- `releaseKeyPassword` - пароль от ключа
+
+Если подпись не настроена, `publishToRuStore` завершится с понятной ошибкой до начала публикации.
