@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.CommonExtension
-
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -18,16 +16,14 @@ subprojects {
         config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
         buildUponDefaultConfig = true
         autoCorrect = true
+        ignoreFailures = true // Позволяет сгенерировать отчеты перед тем как уронить билд
     }
 
-    // Настройка всех задач Detekt во всех модулях
     tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
         reports {
             xml.required.set(true)
             html.required.set(true)
         }
-        // Позволяем Jenkins обрабатывать ошибки самостоятельно
-        ignoreFailures = true
     }
 
     dependencies {
@@ -35,24 +31,26 @@ subprojects {
     }
 }
 
+// Конфигурация Jacoco (покрытие тестами)
 subprojects {
     apply(plugin = "jacoco")
+
     configure<org.gradle.testing.jacoco.plugins.JacocoPluginExtension> {
         toolVersion = "0.8.12"
     }
-    
-    // Используем современный CommonExtension вместо BaseExtension
+
     pluginManager.withPlugin("com.android.application") {
-        extensions.configure<CommonExtension<*, *, *, *, *, *>>("android") {
+        extensions.configure<com.android.build.gradle.AppExtension>("android") {
             buildTypes.getByName("debug") {
-                enableUnitTestCoverage = true
+                isTestCoverageEnabled = true
             }
         }
     }
+
     pluginManager.withPlugin("com.android.library") {
-        extensions.configure<CommonExtension<*, *, *, *, *, *>>("android") {
+        extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
             buildTypes.getByName("debug") {
-                enableUnitTestCoverage = true
+                isTestCoverageEnabled = true
             }
         }
     }
