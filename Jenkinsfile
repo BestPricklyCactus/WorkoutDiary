@@ -49,6 +49,7 @@ pipeline {
                     },
                     'Detekt': {
                         echo 'Running Detekt...'
+                        // Используем catchError, чтобы UNSTABLE результат не прерывал стадию сразу
                         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                             sh './gradlew detekt --parallel'
                         }
@@ -57,16 +58,17 @@ pipeline {
             }
             post {
                 always {
-                    // Debug: list all XML reports found
-                    sh 'find . -name "*.xml" | grep reports || true'
+                    // Debug: list all XML reports found with their full paths
+                    echo 'Searching for reports...'
+                    sh 'find . -path "*/build/reports/*" -name "*.xml" || true'
 
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.xml', allowEmptyArchive: true
-                    archiveArtifacts artifacts: '**/build/reports/detekt/*.xml', allowEmptyArchive: true
-                    archiveArtifacts artifacts: '**/build/reports/detekt/*.html', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/detekt/detekt.xml', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/detekt/detekt.html', allowEmptyArchive: true
 
                     recordIssues(tools: [
-                        androidLintParser(pattern: '**/build/reports/lint-results*.xml'),
-                        detekt(pattern: '**/build/reports/detekt/*.xml')
+                        androidLintParser(pattern: '**/build/reports/lint-results*.xml', id: 'android-lint', name: 'Android Lint'),
+                        detekt(pattern: '**/build/reports/detekt/detekt.xml', id: 'detekt', name: 'Detekt')
                     ])
                 }
             }
@@ -101,7 +103,7 @@ pipeline {
                                 echo String.format('JaCoCo LINE coverage: %.2f%% (%d/%d)', coverage, covered, total)
                                 currentBuild.description = String.format('Coverage: %.2f%%', coverage)
                             } else {
-                                echo 'JaCoCo LINE coverage counter was not found in XML report. Check app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
+                                echo 'JaCoCo LINE coverage counter was not found in XML report.'
                             }
                         } else {
                             echo 'JaCoCo XML report not found.'
@@ -123,7 +125,6 @@ pipeline {
             steps {
                 echo 'Building Debug APK...'
                 sh './gradlew assembleDebug'
-                sh '''find app/build/outputs -type f | sort || true'''
             }
             post {
                 always {
