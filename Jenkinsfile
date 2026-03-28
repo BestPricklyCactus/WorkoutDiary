@@ -50,8 +50,7 @@ pipeline {
                     'Detekt': {
                         echo 'Running Detekt...'
                         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                            // Добавим --info для отладки, если отчеты не создаются
-                            sh './gradlew detekt --parallel --info'
+                            sh './gradlew detekt --parallel'
                         }
                     }
                 )
@@ -59,7 +58,6 @@ pipeline {
             post {
                 always {
                     echo 'Searching for XML reports...'
-                    // Ищем все XML файлы в папках build/reports
                     sh 'find . -path "*/build/reports/*" -name "*.xml" | sort || true'
 
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.xml', allowEmptyArchive: true
@@ -90,14 +88,20 @@ pipeline {
                     script {
                         def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                         if (fileExists(reportPath)) {
-                            def lineData = sh(
-                                script: "grep -o 'counter type=\"LINE\" missed=\"[0-9]*\" covered=\"[0-9]*\"' ${reportPath} | head -n 1 || true",
-                                returnStdout: true
-                            ).trim()
+                            def lineData = sh(script: '''python3 - <<'PY'
+import re
+from pathlib import Path
+path = Path("app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+text = path.read_text(encoding="utf-8")
+match = re.search(r'<counter type="LINE" missed="(\d+)" covered="(\d+)"', text)
+if match:
+    print(match.group(1), match.group(2))
+PY''', returnStdout: true).trim()
                             def lineMatcher = (lineData =~ /missed="(\d+)" covered="(\d+)"/)
-                            if (lineMatcher.find()) {
-                                def missed = lineMatcher.group(1).toInteger()
-                                def covered = lineMatcher.group(2).toInteger()
+                            if (lineData) {
+                                def parts = lineData.tokenize(' ')
+                                def missed = parts[0].toInteger()
+                                def covered = parts[1].toInteger()
                                 def total = missed + covered
                                 def coverage = total > 0 ? (covered * 100.0 / total) : 0.0
                                 echo String.format('JaCoCo LINE coverage: %.2f%% (%d/%d)', coverage, covered, total)
