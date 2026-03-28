@@ -71,6 +71,7 @@ dependencies {
 
     // Dagger
     implementation(libs.dagger)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     ksp(libs.dagger.compiler)
 
     testImplementation(libs.junit)

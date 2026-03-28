@@ -19,6 +19,16 @@ subprojects {
         autoCorrect = true
     }
 
+    // Use string-based task configuration to avoid classpath/import issues in the root script
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+            txt.required.set(false)
+            sarif.required.set(false)
+        }
+    }
+
     dependencies {
         "detektPlugins"(detektFormatting)
     }
