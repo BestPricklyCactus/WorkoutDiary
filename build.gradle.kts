@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.ksp) apply false
-    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.detekt)
 }
 
 val detektFormatting = libs.detekt.formatting
@@ -17,13 +17,13 @@ subprojects {
         buildUponDefaultConfig = true
         allRules = false
         autoCorrect = true
-    }
-
-    // Configure reports on the tasks directly using the class name to avoid type inference issues
-    tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
+        
+        // Настройка отчетов через расширение (рабочий способ для 1.23+)
         reports {
             xml.required.set(true)
             html.required.set(true)
+            xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
+            html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
         }
     }
 
