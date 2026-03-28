@@ -1,4 +1,5 @@
 import org.gradle.api.GradleException
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -30,6 +31,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
+    jacoco
+}
+
+jacoco {
+    toolVersion = "0.8.12"
 }
 
 android {
@@ -67,6 +73,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
     compileOptions {
@@ -193,6 +203,90 @@ afterEvaluate {
     }
 }
 
+tasks.register<JacocoReport>("jacocoTestReport") {
+    group = "verification"
+    description = "Generates JaCoCo coverage report for debug unit tests"
+
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val excludes = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*ComposableSingletons*.*",
+        "**/*_Factory*.*",
+        "**/*_Impl*.*",
+        "**/*_MembersInjector*.*",
+        "**/*Directions*.*",
+        "**/*Directions$*.*",
+        "**/*Args*.*",
+        "**/databinding/*Binding*.*",
+        "**/di/**",
+        "**/*Preview*.*"
+    )
+
+    val coverageProjectDirs = listOf(
+        project.projectDir,
+        project(":core:mvi").projectDir,
+        project(":data").projectDir,
+        project(":feature:common").projectDir,
+        project(":feature:main:api").projectDir,
+        project(":feature:main:impl").projectDir,
+        project(":feature:editor:api").projectDir,
+        project(":feature:editor:impl").projectDir,
+        project(":feature:history:api").projectDir,
+        project(":feature:history:impl").projectDir,
+        project(":feature:report:api").projectDir,
+        project(":feature:report:impl").projectDir,
+        project(":feature:workout:api").projectDir,
+        project(":feature:workout:impl").projectDir,
+        project(":feature:aiworkout:api").projectDir,
+        project(":feature:aiworkout:impl").projectDir,
+    )
+
+    classDirectories.setFrom(files(coverageProjectDirs.flatMap { moduleDir ->
+        listOf(
+            fileTree(moduleDir) {
+                include("build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/**/*.class")
+                exclude(excludes)
+            },
+            fileTree(moduleDir) {
+                include("build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes/**/*.class")
+                exclude(excludes)
+            },
+            fileTree(moduleDir) {
+                include("build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/**/*.class")
+                exclude(excludes)
+            }
+        )
+    }))
+    sourceDirectories.setFrom(files(coverageProjectDirs.flatMap { moduleDir ->
+        listOf(
+            File(moduleDir, "src/main/java"),
+            File(moduleDir, "src/main/kotlin")
+        )
+    }))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "jacoco/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/**/*.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/**/*.ec"
+            )
+        }
+    )
+}
+
 dependencies {
     implementation(project(":core:mvi"))
     implementation(project(":data"))
@@ -233,10 +327,13 @@ dependencies {
     ksp(libs.dagger.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(libs.jacoco.agent)
 }
