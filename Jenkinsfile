@@ -42,18 +42,10 @@ pipeline {
                 }
             }
             steps {
-                parallel(
-                    'Lint': {
-                        echo 'Running Lint...'
-                        sh './gradlew lintDebug'
-                    },
-                    'Detekt': {
-                        echo 'Running Detekt...'
-                        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                            sh './gradlew detektAll --parallel'
-                        }
-                    }
-                )
+                echo 'Running Lint and Detekt...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh './gradlew lintDebug detektAll'
+                }
             }
             post {
                 always {
@@ -88,19 +80,7 @@ pipeline {
                     script {
                         def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                         if (fileExists(reportPath)) {
-                            def lineData = sh(script: '''python3 - <<'PY'
-from pathlib import Path
-
-text = Path("app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml").read_text(encoding="utf-8")
-marker = 'counter type="LINE" missed="'
-start = text.find(marker)
-if start != -1:
-    start += len(marker)
-    rest = text[start:]
-    missed, rest = rest.split('" covered="', 1)
-    covered = rest.split('"', 1)[0]
-    print(missed, covered)
-PY''', returnStdout: true).trim()
+                            def lineData = sh(script: '''grep -o 'counter type="LINE" missed="[0-9]*" covered="[0-9]*"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -n 1 | sed -E 's/.*missed="([0-9]+)" covered="([0-9]+)"/\1 \2/' || true''', returnStdout: true).trim()
                             if (lineData) {
                                 def parts = lineData.tokenize(' ')
                                 def missed = parts[0].toInteger()
