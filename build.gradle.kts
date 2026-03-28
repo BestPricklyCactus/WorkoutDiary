@@ -31,3 +31,25 @@ subprojects {
         "detektPlugins"(detektFormatting)
     }
 }
+
+subprojects {
+    apply(plugin = "jacoco")
+
+    configure<org.gradle.testing.jacoco.plugins.JacocoPluginExtension> {
+        toolVersion = "0.8.12"
+    }
+
+    afterEvaluate {
+        if (plugins.hasPlugin("com.android.application") ||
+            plugins.hasPlugin("com.android.library")) {
+
+            extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
+                buildTypes {
+                    getByName("debug") {
+                        enableUnitTestCoverage = true
+                    }
+                }
+            }
+        }
+    }
+}

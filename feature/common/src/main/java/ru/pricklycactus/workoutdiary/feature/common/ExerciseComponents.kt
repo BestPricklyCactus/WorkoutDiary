@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import ru.pricklycactus.workoutdiary.data.database.Exercise
+import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
 
 @Composable
 fun ExerciseForm(
@@ -58,7 +58,7 @@ fun ExerciseForm(
 
 @Composable
 fun ExercisesList(
-    exercises: List<Exercise>,
+    exercises: List<ExerciseDomain>,
     selectedExerciseIds: Set<Long>,
     onExerciseSelect: (Long, Boolean) -> Unit,
     modifier: Modifier = Modifier,

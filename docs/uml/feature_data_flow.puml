@@ -1,0 +1,25 @@
+@startuml
+title WorkoutDiary - Поток данных внутри фичи
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+start
+:User action;
+:Screen dispatches Intent;
+:Feature Store receives Intent;
+if (Need data?) then (yes)
+  :Call WorkoutRepository;
+  if (Local or external?) then (local)
+    :DAO / Room;
+  else (external)
+    :OpenRouter / RuStore API;
+  endif
+endif
+:Store updates ViewState;
+:Optional Effect is emitted;
+:Screen redraws UI;
+stop
+
+@enduml

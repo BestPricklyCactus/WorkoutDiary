@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pricklycactus.workoutdiary.core.mvi.MviStore
-import ru.pricklycactus.workoutdiary.data.database.Exercise
+import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorEffect
 import ru.pricklycactus.workoutdiary.feature.editor.api.EditorIntent
@@ -58,7 +58,7 @@ class EditorStoreImpl(
         if (currentState.exerciseName.isBlank()) return
         
         scope.launch {
-            val exercise = Exercise(
+            val exercise = ExerciseDomain(
                 id = currentState.editingExerciseId ?: 0,
                 name = currentState.exerciseName,
                 description = currentState.exerciseDescription

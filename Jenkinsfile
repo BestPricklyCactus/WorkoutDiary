@@ -34,10 +34,9 @@ pipeline {
         stage('Lint & Static Analysis') {
             when {
                 anyOf {
-                    environment name: 'BRANCH_NAME', value: 'feature/*'
-                    environment name: 'BRANCH_NAME', value: 'develop'
-                    environment name: 'BRANCH_NAME', value: 'main'
-                    branch 'feature/*'
+                    branch 'develop'
+                    branch 'main'
+                    expression { env.BRANCH_NAME?.startsWith('feature/') }
                     changeRequest()
                     triggeredBy 'TimerTrigger'
                 }
@@ -78,12 +77,36 @@ pipeline {
                 not { triggeredBy 'TimerTrigger' }
             }
             steps {
-                echo 'Running Unit Tests...'
-                sh './gradlew testDebugUnitTest'
+                echo 'Running Unit Tests with coverage...'
+                sh './gradlew testDebugUnitTest jacocoTestReport'
             }
             post {
                 always {
                     junit '**/build/test-results/**/*.xml'
+                    archiveArtifacts artifacts: '**/build/reports/jacoco/**/*.xml', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/jacoco/**/*.html', allowEmptyArchive: true
+                    script {
+                        def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
+                        if (fileExists(reportPath)) {
+                            def lineData = sh(
+                                script: "grep -o 'counter type=\"LINE\" missed=\"[0-9]*\" covered=\"[0-9]*\"' ${reportPath} | head -n 1 || true",
+                                returnStdout: true
+                            ).trim()
+                            def lineMatcher = (lineData =~ /missed="(\d+)" covered="(\d+)"/)
+                            if (lineMatcher.find()) {
+                                def missed = lineMatcher.group(1).toInteger()
+                                def covered = lineMatcher.group(2).toInteger()
+                                def total = missed + covered
+                                def coverage = total > 0 ? (covered * 100.0 / total) : 0.0
+                                echo String.format('JaCoCo LINE coverage: %.2f%% (%d/%d)', coverage, covered, total)
+                                currentBuild.description = String.format('Coverage: %.2f%%', coverage)
+                            } else {
+                                echo 'JaCoCo LINE coverage counter was not found in XML report. Check app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
+                            }
+                        } else {
+                            echo 'JaCoCo XML report not found.'
+                        }
+                    }
                 }
             }
         }
@@ -91,19 +114,20 @@ pipeline {
         stage('Build Debug APK') {
             when {
                 anyOf {
-                    environment name: 'BRANCH_NAME', value: 'main'
-                    environment name: 'BRANCH_NAME', value: 'develop'
-                    environment name: 'BRANCH_NAME', value: 'feature/*'
+                    branch 'main'
+                    branch 'develop'
+                    expression { env.BRANCH_NAME?.startsWith('feature/') }
                     changeRequest()
                 }
             }
             steps {
                 echo 'Building Debug APK...'
                 sh './gradlew assembleDebug'
+                sh '''find app/build/outputs -type f | sort || true'''
             }
             post {
-                success {
-                    archiveArtifacts artifacts: 'app/build/outputs/apk/debug/*.apk', fingerprint: true
+                always {
+                    archiveArtifacts artifacts: 'app/build/outputs/**/*.apk, app/build/outputs/**/*.aab', fingerprint: true, allowEmptyArchive: true
                 }
             }
         }
