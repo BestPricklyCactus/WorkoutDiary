@@ -101,7 +101,7 @@ pipeline {
             steps {
                 echo 'Building Debug APK...'
                 sh './gradlew assembleDebug'
-                sh 'find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) | sort || true'
+                sh '''find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) | sort || true'''
             }
             post {
                 always {
