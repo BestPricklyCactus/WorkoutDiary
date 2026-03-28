@@ -17,7 +17,10 @@ subprojects {
         buildUponDefaultConfig = true
         allRules = false
         autoCorrect = true
+    }
 
+    // Configure reports on the tasks directly using the class name to avoid type inference issues
+    tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
         reports {
             xml.required.set(true)
             html.required.set(true)
