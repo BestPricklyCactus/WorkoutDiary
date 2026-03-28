@@ -230,15 +230,45 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Preview*.*"
     )
 
-    val javaClasses = fileTree("${layout.buildDirectory.get()}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
-        exclude(excludes)
-    }
-    val kotlinClasses = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(excludes)
-    }
+    val coverageProjects = listOf(
+        project,
+        project(":core:mvi"),
+        project(":data"),
+        project(":feature:common"),
+        project(":feature:main:api"),
+        project(":feature:main:impl"),
+        project(":feature:editor:api"),
+        project(":feature:editor:impl"),
+        project(":feature:history:api"),
+        project(":feature:history:impl"),
+        project(":feature:report:api"),
+        project(":feature:report:impl"),
+        project(":feature:workout:api"),
+        project(":feature:workout:impl"),
+        project(":feature:aiworkout:api"),
+        project(":feature:aiworkout:impl")
+    )
 
-    classDirectories.setFrom(files(javaClasses, kotlinClasses))
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    classDirectories.setFrom(
+        coverageProjects.flatMap { moduleProject ->
+            listOf(
+                moduleProject.fileTree("${moduleProject.layout.buildDirectory.get()}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+                    exclude(excludes)
+                },
+                moduleProject.fileTree("${moduleProject.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+                    exclude(excludes)
+                }
+            )
+        }
+    )
+    sourceDirectories.setFrom(
+        coverageProjects.flatMap { moduleProject ->
+            listOf(
+                moduleProject.file("src/main/java"),
+                moduleProject.file("src/main/kotlin")
+            )
+        }
+    )
     executionData.setFrom(
         fileTree(layout.buildDirectory) {
             include(
