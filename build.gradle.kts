@@ -12,21 +12,20 @@ val detektFormatting = libs.detekt.formatting
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
+    // Базовая настройка Detekt через расширение
     extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension>("detekt") {
         config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
         buildUponDefaultConfig = true
         autoCorrect = true
     }
 
-    // Безопасная настройка задач при подключении плагина в модуле
-    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-        tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-            reports {
-                xml.required.set(true)
-                html.required.set(true)
-                xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
-                html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
-            }
+    // Настройка генерации отчетов для всех задач Detekt (Main, Test и т.д.)
+    tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+            xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
+            html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
         }
     }
 
