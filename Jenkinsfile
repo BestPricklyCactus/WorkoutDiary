@@ -50,7 +50,6 @@ pipeline {
                     },
                     'Detekt': {
                         echo 'Running Detekt...'
-                        // 2. Игнорируем ошибки Detekt, чтобы пайплайн не падал, а помечался как UNSTABLE
                         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                             sh './gradlew detekt --parallel'
                         }
@@ -59,14 +58,15 @@ pipeline {
             }
             post {
                 always {
+                    // Debug: list all XML reports found
+                    sh 'find . -name "*.xml" | grep reports || true'
+
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.xml', allowEmptyArchive: true
-                    archiveArtifacts artifacts: '**/build/reports/lint-results*.html', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/detekt/*.xml', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/detekt/*.html', allowEmptyArchive: true
 
-                    // 3. Интеграция с плагином Warnings Next Generation
                     recordIssues(tools: [
-                        androidLint(pattern: '**/build/reports/lint-results*.xml'),
+                        androidLintParser(pattern: '**/build/reports/lint-results*.xml'),
                         detekt(pattern: '**/build/reports/detekt/*.xml')
                     ])
                 }
