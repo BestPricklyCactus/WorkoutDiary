@@ -28,11 +28,11 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.flow.collectLatest
 import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutEffect
+import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseState
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseStatus
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutIntent
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutStore
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutViewState
-import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseState
 import java.util.Locale
 
 @Composable
@@ -98,7 +98,15 @@ fun WorkoutScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = !state.isSaving
         ) {
-            Text(if (state.isSaving) stringResource(R.string.workout_saving) else stringResource(R.string.workout_finish_button))
+            Text(
+                if (state.isSaving) {
+                    stringResource(
+                        R.string.workout_saving
+                    )
+                } else {
+                    stringResource(R.string.workout_finish_button)
+                }
+            )
         }
     }
 }
@@ -134,23 +142,47 @@ private fun ExerciseItem(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.workout_sets_label), style = MaterialTheme.typography.bodyMedium)
-                IconButton(onClick = onDecreaseSets, enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED) {
-                    Icon(Icons.Default.Remove, contentDescription = stringResource(R.string.workout_less_content_description))
+                IconButton(
+                    onClick = onDecreaseSets,
+                    enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED
+                ) {
+                    Icon(
+                        Icons.Default.Remove,
+                        contentDescription = stringResource(R.string.workout_less_content_description)
+                    )
                 }
                 Text(exerciseState.sets.toString(), style = MaterialTheme.typography.bodyLarge)
-                IconButton(onClick = onIncreaseSets, enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.workout_more_content_description))
+                IconButton(
+                    onClick = onIncreaseSets,
+                    enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.workout_more_content_description)
+                    )
                 }
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.workout_reps_label), style = MaterialTheme.typography.bodyMedium)
-                IconButton(onClick = onDecreaseReps, enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED) {
-                    Icon(Icons.Default.Remove, contentDescription = stringResource(R.string.workout_less_content_description))
+                IconButton(
+                    onClick = onDecreaseReps,
+                    enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED
+                ) {
+                    Icon(
+                        Icons.Default.Remove,
+                        contentDescription = stringResource(R.string.workout_less_content_description)
+                    )
                 }
                 Text(exerciseState.reps.toString(), style = MaterialTheme.typography.bodyLarge)
-                IconButton(onClick = onIncreaseReps, enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.workout_more_content_description))
+                IconButton(
+                    onClick = onIncreaseReps,
+                    enabled = exerciseState.status != WorkoutExerciseStatus.COMPLETED
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.workout_more_content_description)
+                    )
                 }
             }
 

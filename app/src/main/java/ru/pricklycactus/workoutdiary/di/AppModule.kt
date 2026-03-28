@@ -1,12 +1,12 @@
 package ru.pricklycactus.workoutdiary.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
-import android.content.Context
-import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabase
 import ru.pricklycactus.workoutdiary.data.dao.ExerciseDao
 import ru.pricklycactus.workoutdiary.data.dao.WorkoutDao
+import ru.pricklycactus.workoutdiary.data.database.WorkoutDatabase
+import javax.inject.Singleton
 
 @Module
 class AppModule(private val context: Context) {

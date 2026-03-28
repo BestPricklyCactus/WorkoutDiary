@@ -7,11 +7,11 @@ import ru.pricklycactus.workoutdiary.data.domain.ExerciseDomain
 import ru.pricklycactus.workoutdiary.data.domain.WorkoutDomain
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutEffect
+import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseState
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseStatus
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutIntent
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutStore
 import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutViewState
-import ru.pricklycactus.workoutdiary.feature.workout.api.WorkoutExerciseState
 
 class WorkoutStoreImpl(
     selectedExercises: List<ExerciseDomain>,
@@ -28,7 +28,8 @@ class WorkoutStoreImpl(
         }
     ),
     scope
-), WorkoutStore {
+),
+    WorkoutStore {
 
     init {
         loadLastValues()
@@ -54,9 +55,13 @@ class WorkoutStoreImpl(
     override fun dispatch(intent: WorkoutIntent) {
         when (intent) {
             is WorkoutIntent.IncreaseReps -> updateExercise(intent.exerciseId) { it.copy(reps = it.reps + 1) }
-            is WorkoutIntent.DecreaseReps -> updateExercise(intent.exerciseId) { it.copy(reps = (it.reps - 1).coerceAtLeast(0)) }
+            is WorkoutIntent.DecreaseReps -> updateExercise(
+                intent.exerciseId
+            ) { it.copy(reps = (it.reps - 1).coerceAtLeast(0)) }
             is WorkoutIntent.IncreaseSets -> updateExercise(intent.exerciseId) { it.copy(sets = it.sets + 1) }
-            is WorkoutIntent.DecreaseSets -> updateExercise(intent.exerciseId) { it.copy(sets = (it.sets - 1).coerceAtLeast(0)) }
+            is WorkoutIntent.DecreaseSets -> updateExercise(
+                intent.exerciseId
+            ) { it.copy(sets = (it.sets - 1).coerceAtLeast(0)) }
             is WorkoutIntent.StartNow -> startExercise(intent.exerciseId)
             is WorkoutIntent.CompleteExercise -> completeExercise(intent.exerciseId)
             WorkoutIntent.FinishClick -> handleFinishClick()
@@ -139,8 +144,11 @@ class WorkoutStoreImpl(
         updateState { state ->
             state.copy(
                 exercises = state.exercises.map { exerciseState ->
-                    if (exerciseState.exercise.id == exerciseId) transform(exerciseState)
-                    else exerciseState
+                    if (exerciseState.exercise.id == exerciseId) {
+                        transform(exerciseState)
+                    } else {
+                        exerciseState
+                    }
                 }
             )
         }

@@ -103,7 +103,6 @@ class AiWorkoutStoreImpl(
         }
         return ExerciseDomain(name = name, description = details)
     }
-
 }
 
 private object AiWorkoutStrings {

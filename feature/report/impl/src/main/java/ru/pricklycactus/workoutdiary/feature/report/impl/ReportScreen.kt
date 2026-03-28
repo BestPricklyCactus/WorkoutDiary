@@ -1,8 +1,8 @@
 package ru.pricklycactus.workoutdiary.feature.report.impl
 
 import android.app.DatePickerDialog
-import android.content.ContentValues
 import android.content.ComponentName
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -104,12 +104,19 @@ fun ReportScreen(
         Text(text = stringResource(R.string.report_title), style = MaterialTheme.typography.headlineMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
             Button(onClick = onBack, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.report_hide)) }
-            Button(onClick = { store.dispatch(ReportIntent.ShareReport) }, modifier = Modifier.weight(1f), enabled = state.report.hasData) {
+            Button(
+                onClick = { store.dispatch(ReportIntent.ShareReport) },
+                modifier = Modifier.weight(1f),
+                enabled = state.report.hasData
+            ) {
                 Text(stringResource(R.string.report_share))
             }
         }
         Column(verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
-            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
+            ) {
                 ReportPeriod.entries.forEach { period ->
                     FilterChip(
                         selected = state.selectedReportPeriod == period,
@@ -121,23 +128,46 @@ fun ReportScreen(
             if (state.selectedReportPeriod == ReportPeriod.CUSTOM) {
                 Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
                     Button(onClick = { store.dispatch(ReportIntent.PickCustomStartDate) }) {
-                        Text(stringResource(R.string.report_start_date, state.customStartDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)))
+                        Text(
+                            stringResource(
+                                R.string.report_start_date,
+                                state.customStartDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)
+                            )
+                        )
                     }
                     Button(onClick = { store.dispatch(ReportIntent.PickCustomEndDate) }) {
-                        Text(stringResource(R.string.report_end_date, state.customEndDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)))
+                        Text(
+                            stringResource(
+                                R.string.report_end_date,
+                                state.customEndDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)
+                            )
+                        )
                     }
                 }
             }
-            if (state.report.hasData) ReportTableView(state.report) else Text(text = stringResource(R.string.report_empty), style = MaterialTheme.typography.bodyMedium)
+            if (state.report.hasData) {
+                ReportTableView(
+                    state.report
+                )
+            } else {
+                Text(text = stringResource(R.string.report_empty), style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }
 
 @Composable private fun ReportTableView(report: ReportTable) {
     Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(Dimensions.CardPadding), verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(Dimensions.CardPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
+        ) {
             Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
-                TableCell(text = stringResource(R.string.report_exercise_header), width = exerciseWidth, isHeader = true)
+                TableCell(
+                    text = stringResource(R.string.report_exercise_header),
+                    width = exerciseWidth,
+                    isHeader = true
+                )
                 report.columns.forEach { TableCell(text = it.label, width = dateWidth, isHeader = true) }
             }
             report.rows.forEach { row ->
@@ -151,7 +181,11 @@ fun ReportScreen(
 }
 
 @Composable private fun TableCell(text: String, width: Dp, isHeader: Boolean = false) {
-    Text(text = text, modifier = Modifier.width(width), style = if (isHeader) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium)
+    Text(
+        text = text,
+        modifier = Modifier.width(width),
+        style = if (isHeader) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium
+    )
 }
 
 private fun ReportPeriod.labelResId(): Int = when (this) {
@@ -162,7 +196,10 @@ private fun ReportPeriod.labelResId(): Int = when (this) {
     ReportPeriod.CUSTOM -> R.string.report_period_custom
 }
 
-private fun formatPickerDate(value: Long): String = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date(value))
+private fun formatPickerDate(value: Long): String = SimpleDateFormat(
+    "dd.MM.yyyy",
+    Locale.getDefault()
+).format(Date(value))
 
 private val exerciseWidth = 160.dp
 private val dateWidth = 72.dp
@@ -179,14 +216,29 @@ private fun createReportBitmap(context: android.content.Context, report: ReportT
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     canvas.drawColor(Color.WHITE)
-    val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK; textSize = 14 * density; typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD) }
-    val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.DKGRAY; textSize = 13 * density }
-    val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.LTGRAY; strokeWidth = 1 * density }
+    val headerPaint = Paint(
+        Paint.ANTI_ALIAS_FLAG
+    ).apply {
+        color = Color.BLACK
+        textSize = 14 * density
+        typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
+    }
+    val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.DKGRAY
+        textSize = 13 * density
+    }
+    val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.LTGRAY
+        strokeWidth = 1 * density
+    }
     var x = padding.toFloat()
     val headerBaseline = padding + (headerHeight * 0.65f)
     canvas.drawText(context.getString(R.string.report_exercise_header), x, headerBaseline, headerPaint)
     x += exerciseWidthPx
-    report.columns.forEach { canvas.drawText(it.label, x + 8 * density, headerBaseline, headerPaint); x += dateWidthPx }
+    report.columns.forEach {
+        canvas.drawText(it.label, x + 8 * density, headerBaseline, headerPaint)
+        x += dateWidthPx
+    }
     var y = padding + headerHeight
     canvas.drawLine(padding.toFloat(), y.toFloat(), (width - padding).toFloat(), y.toFloat(), linePaint)
     report.rows.ifEmpty { listOf(ReportRow("-", emptyList())) }.forEach { row ->
@@ -195,7 +247,15 @@ private fun createReportBitmap(context: android.content.Context, report: ReportT
         val baseline = y - rowHeight * 0.35f
         canvas.drawText(row.exerciseName, cellX, baseline, textPaint)
         cellX += exerciseWidthPx
-        row.values.forEach { value -> canvas.drawText(value, cellX + 8 * density, baseline, textPaint); cellX += dateWidthPx }
+        row.values.forEach { value ->
+            canvas.drawText(
+                value,
+                cellX + 8 * density,
+                baseline,
+                textPaint
+            )
+            cellX += dateWidthPx
+        }
         canvas.drawLine(padding.toFloat(), y.toFloat(), (width - padding).toFloat(), y.toFloat(), linePaint)
     }
     return bitmap
@@ -216,7 +276,11 @@ private fun saveBitmapToDownloads(context: android.content.Context, bitmap: Bitm
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
             val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-            if (uri != null) context.contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            if (uri != null) {
+                context.contentResolver.openOutputStream(
+                    uri
+                )?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
         } else {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             if (!downloadsDir.exists()) downloadsDir.mkdirs()

@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.pricklycactus.workoutdiary.feature.common.Dimensions
-import ru.pricklycactus.workoutdiary.feature.history.api.HistoryIntent
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryStore
 import ru.pricklycactus.workoutdiary.feature.history.api.HistoryViewState
 import java.text.SimpleDateFormat
@@ -69,7 +68,10 @@ fun HistoryScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                text = stringResource(R.string.history_total_time, formatDuration(workout.totalDurationMillis)),
+                                text = stringResource(
+                                    R.string.history_total_time,
+                                    formatDuration(workout.totalDurationMillis)
+                                ),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             workout.exercises.forEach { exercise ->
