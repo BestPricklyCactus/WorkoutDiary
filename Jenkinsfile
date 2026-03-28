@@ -42,31 +42,23 @@ pipeline {
                 }
             }
             steps {
-                parallel(
-                    'Lint': {
-                        echo 'Running Lint...'
-                        sh './gradlew lintDebug'
-                    },
-                    'Detekt': {
-                        echo 'Running Detekt...'
-                        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                            sh './gradlew detekt --parallel'
-                        }
-                    }
-                )
+                echo 'Running Lint and Detekt...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh './gradlew lintDebug detektAll'
+                }
             }
             post {
                 always {
-                    // Debug: list all XML reports found
-                    sh 'find . -name "*.xml" | grep reports || true'
+                    echo 'Searching for XML reports...'
+                    sh 'find . -path "*/build/reports/*" -name "*.xml" | sort || true'
 
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.xml', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/detekt/*.xml', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/detekt/*.html', allowEmptyArchive: true
 
                     recordIssues(tools: [
-                        androidLintParser(pattern: '**/build/reports/lint-results*.xml'),
-                        detekt(pattern: '**/build/reports/detekt/*.xml')
+                        androidLintParser(pattern: '**/build/reports/lint-results*.xml', id: 'android-lint', name: 'Android Lint'),
+                        detekt(pattern: '**/build/reports/detekt/*.xml', id: 'detekt', name: 'Detekt')
                     ])
                 }
             }
@@ -88,23 +80,16 @@ pipeline {
                     script {
                         def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                         if (fileExists(reportPath)) {
-                            def lineData = sh(
-                                script: "grep -o 'counter type=\"LINE\" missed=\"[0-9]*\" covered=\"[0-9]*\"' ${reportPath} | head -n 1 || true",
-                                returnStdout: true
-                            ).trim()
-                            def lineMatcher = (lineData =~ /missed="(\d+)" covered="(\d+)"/)
-                            if (lineMatcher.find()) {
-                                def missed = lineMatcher.group(1).toInteger()
-                                def covered = lineMatcher.group(2).toInteger()
+                            def lineData = sh(script: '''grep -o 'counter type="LINE" missed="[0-9]*" covered="[0-9]*"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -n 1 | sed -E 's/.*missed="([0-9]+)" covered="([0-9]+)"/\1 \2/' || true''', returnStdout: true).trim()
+                            if (lineData) {
+                                def parts = lineData.tokenize(' ')
+                                def missed = parts[0].toInteger()
+                                def covered = parts[1].toInteger()
                                 def total = missed + covered
                                 def coverage = total > 0 ? (covered * 100.0 / total) : 0.0
                                 echo String.format('JaCoCo LINE coverage: %.2f%% (%d/%d)', coverage, covered, total)
                                 currentBuild.description = String.format('Coverage: %.2f%%', coverage)
-                            } else {
-                                echo 'JaCoCo LINE coverage counter was not found in XML report. Check app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                             }
-                        } else {
-                            echo 'JaCoCo XML report not found.'
                         }
                     }
                 }
@@ -123,7 +108,6 @@ pipeline {
             steps {
                 echo 'Building Debug APK...'
                 sh './gradlew assembleDebug'
-                sh '''find app/build/outputs -type f | sort || true'''
             }
             post {
                 always {

@@ -21,7 +21,11 @@ class LlmWorkoutGenerator(
             LlmWorkoutMessages.MissingApiKey
         }
 
-        val connection = (URL("https://openrouter.ai/api/v1/chat/completions").openConnection() as HttpURLConnection).apply {
+        val connection = (
+            URL(
+                "https://openrouter.ai/api/v1/chat/completions"
+            ).openConnection() as HttpURLConnection
+            ).apply {
             requestMethod = "POST"
             doOutput = true
             connectTimeout = REQUEST_TIMEOUT_MILLIS
@@ -36,21 +40,24 @@ class LlmWorkoutGenerator(
             val requestBody = JSONObject()
                 .put("model", model)
                 .put("temperature", 0.7)
-                .put("messages", JSONArray().apply {
-                    put(
-                        JSONObject()
-                            .put("role", "system")
-                            .put(
-                                "content",
-                                LlmWorkoutMessages.SystemPrompt
-                            )
-                    )
-                    put(
-                        JSONObject()
-                            .put("role", "user")
-                            .put("content", prompt)
-                    )
-                })
+                .put(
+                    "messages",
+                    JSONArray().apply {
+                        put(
+                            JSONObject()
+                                .put("role", "system")
+                                .put(
+                                    "content",
+                                    LlmWorkoutMessages.SystemPrompt
+                                )
+                        )
+                        put(
+                            JSONObject()
+                                .put("role", "user")
+                                .put("content", prompt)
+                        )
+                    }
+                )
 
             connection.outputStream.bufferedWriter().use { writer ->
                 writer.write(requestBody.toString())

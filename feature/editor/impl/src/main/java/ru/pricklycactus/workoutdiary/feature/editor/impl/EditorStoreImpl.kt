@@ -56,7 +56,7 @@ class EditorStoreImpl(
 
     private fun saveExercise() {
         if (currentState.exerciseName.isBlank()) return
-        
+
         scope.launch {
             val exercise = ExerciseDomain(
                 id = currentState.editingExerciseId ?: 0,

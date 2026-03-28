@@ -18,11 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiGeneratedExercise
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiWorkoutIntent
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiWorkoutStore
 import ru.pricklycactus.workoutdiary.feature.aiworkout.api.AiWorkoutViewState
+import ru.pricklycactus.workoutdiary.feature.common.Dimensions
 
 @Composable
 fun AiWorkoutScreen(

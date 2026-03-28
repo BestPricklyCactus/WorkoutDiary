@@ -45,10 +45,16 @@ class ReportStoreImpl(
                 refreshReport()
             }
             ReportIntent.PickCustomStartDate -> sendEffect(
-                ReportEffect.OpenDatePicker(DatePickerTarget.START, currentState.customStartDate ?: System.currentTimeMillis())
+                ReportEffect.OpenDatePicker(
+                    DatePickerTarget.START,
+                    currentState.customStartDate ?: System.currentTimeMillis()
+                )
             )
             ReportIntent.PickCustomEndDate -> sendEffect(
-                ReportEffect.OpenDatePicker(DatePickerTarget.END, currentState.customEndDate ?: System.currentTimeMillis())
+                ReportEffect.OpenDatePicker(
+                    DatePickerTarget.END,
+                    currentState.customEndDate ?: System.currentTimeMillis()
+                )
             )
             is ReportIntent.UpdateCustomStartDate -> {
                 updateState { it.copy(customStartDate = startOfDay(intent.timestamp)) }
@@ -71,9 +77,12 @@ class ReportStoreImpl(
     }
 
     private fun refreshReport() {
-        val range = resolveRange(currentState.selectedReportPeriod, currentState.customStartDate, currentState.customEndDate)
+        val range =
+            resolveRange(currentState.selectedReportPeriod, currentState.customStartDate, currentState.customEndDate)
         val filtered = allWorkouts.filter { range == null || it.workout.date in range.first..range.second }
-        val columns = filtered.map { it.workout.date }.distinct().sorted().map { ReportColumn(it, reportDateFormatter.format(Date(it))) }
+        val columns = filtered.map {
+            it.workout.date
+        }.distinct().sorted().map { ReportColumn(it, reportDateFormatter.format(Date(it))) }
         val rows = filtered.groupBy { it.exercise.name }
             .toSortedMap(String.CASE_INSENSITIVE_ORDER)
             .map { (exerciseName, items) ->
@@ -94,10 +103,32 @@ class ReportStoreImpl(
         }
     }
 
-    private fun daysAgo(base: Long, days: Int): Long = Calendar.getInstance().run { timeInMillis = base; add(Calendar.DAY_OF_YEAR, -days); timeInMillis }
-    private fun monthsAgo(base: Long, months: Int): Long = Calendar.getInstance().run { timeInMillis = base; add(Calendar.MONTH, -months); timeInMillis }
-    private fun startOfDay(value: Long): Long = Calendar.getInstance().run { timeInMillis = value; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0); timeInMillis }
-    private fun endOfDay(value: Long): Long = Calendar.getInstance().run { timeInMillis = value; set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59); set(Calendar.MILLISECOND, 999); timeInMillis }
+    private fun daysAgo(base: Long, days: Int): Long = Calendar.getInstance().run {
+        timeInMillis = base
+        add(Calendar.DAY_OF_YEAR, -days)
+        timeInMillis
+    }
+    private fun monthsAgo(base: Long, months: Int): Long = Calendar.getInstance().run {
+        timeInMillis = base
+        add(Calendar.MONTH, -months)
+        timeInMillis
+    }
+    private fun startOfDay(value: Long): Long = Calendar.getInstance().run {
+        timeInMillis = value
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+        timeInMillis
+    }
+    private fun endOfDay(value: Long): Long = Calendar.getInstance().run {
+        timeInMillis = value
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+        timeInMillis
+    }
 
     private companion object {
         val reportDateFormatter = SimpleDateFormat("dd.MM", Locale.getDefault())

@@ -1,9 +1,9 @@
 package ru.pricklycactus.workoutdiary.feature.workout.api
 
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
-import ru.pricklycactus.workoutdiary.core.mvi.MviIntent
+import kotlinx.coroutines.flow.StateFlow
 import ru.pricklycactus.workoutdiary.core.mvi.MviEffect
+import ru.pricklycactus.workoutdiary.core.mvi.MviIntent
 
 interface WorkoutStore {
     val state: StateFlow<WorkoutViewState>

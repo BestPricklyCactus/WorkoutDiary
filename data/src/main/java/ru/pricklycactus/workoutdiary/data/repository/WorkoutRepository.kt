@@ -17,27 +17,27 @@ class WorkoutRepository @Inject constructor(
     private val exerciseDao: ExerciseDao,
     private val workoutDao: WorkoutDao
 ) {
-    fun getAllExercises(): Flow<List<ExerciseDomain>> = 
+    fun getAllExercises(): Flow<List<ExerciseDomain>> =
         exerciseDao.getAllExercises().map { entities -> entities.map { it.toDomain() } }
 
-    fun getAllWorkouts(): Flow<List<WorkoutDomain>> = 
+    fun getAllWorkouts(): Flow<List<WorkoutDomain>> =
         workoutDao.getAllWorkouts().map { entities -> entities.map { it.toDomain() } }
 
-    fun getWorkoutsWithExercises(): Flow<List<WorkoutWithExerciseDomain>> = 
+    fun getWorkoutsWithExercises(): Flow<List<WorkoutWithExerciseDomain>> =
         workoutDao.getWorkoutsWithExercises().map { entities -> entities.map { it.toDomain() } }
 
-    suspend fun getLastWorkoutForExercise(exerciseId: Long): WorkoutDomain? = 
+    suspend fun getLastWorkoutForExercise(exerciseId: Long): WorkoutDomain? =
         workoutDao.getLastWorkoutForExercise(exerciseId)?.toDomain()
 
-    suspend fun upsertExercise(exercise: ExerciseDomain) = 
+    suspend fun upsertExercise(exercise: ExerciseDomain) =
         exerciseDao.upsertExercise(exercise.toEntity())
 
-    suspend fun deleteExercise(exercise: ExerciseDomain) = 
+    suspend fun deleteExercise(exercise: ExerciseDomain) =
         exerciseDao.deleteExercise(exercise.toEntity())
 
-    suspend fun insertWorkout(workout: WorkoutDomain) = 
+    suspend fun insertWorkout(workout: WorkoutDomain) =
         workoutDao.insertWorkout(workout.toEntity())
 
-    suspend fun insertWorkouts(workouts: List<WorkoutDomain>) = 
+    suspend fun insertWorkouts(workouts: List<WorkoutDomain>) =
         workoutDao.insertWorkouts(workouts.map { it.toEntity() })
 }

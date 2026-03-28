@@ -24,7 +24,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.pricklycactus.workoutdiary.data.repository.WorkoutRepository
 import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.AiWorkoutScreen
-import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.BuildConfig as AiWorkoutBuildConfig
 import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.AiWorkoutStoreImpl
 import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.LlmWorkoutGenerator
 import ru.pricklycactus.workoutdiary.feature.editor.impl.EditorScreen
@@ -39,6 +38,7 @@ import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutScreen
 import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutStoreImpl
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
 import javax.inject.Inject
+import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.BuildConfig as AiWorkoutBuildConfig
 
 class MainActivity : ComponentActivity() {
 
@@ -95,7 +95,8 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(ScreenRoutes.WorkoutProcess) {
                             val selectedExercises = mainState.exercises.filter { it.id in mainState.selectedExerciseIds }
-                            val workoutStore = remember { WorkoutStoreImpl(selectedExercises, workoutRepository, scope) }
+                            val workoutStore =
+                                remember { WorkoutStoreImpl(selectedExercises, workoutRepository, scope) }
                             val workoutState by workoutStore.state.collectAsState()
 
                             WorkoutScreen(

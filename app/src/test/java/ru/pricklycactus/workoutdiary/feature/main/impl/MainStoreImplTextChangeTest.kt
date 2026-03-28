@@ -42,8 +42,16 @@ class MainStoreImplTextChangeTest(
         @JvmStatic
         @Parameterized.Parameters(name = "field={0}")
         fun data(): List<Array<Any>> = listOf(
-            arrayOf("name", "Squat", { state: ru.pricklycactus.workoutdiary.feature.main.api.MainViewState -> state.exerciseName }),
-            arrayOf("description", "Leg day", { state: ru.pricklycactus.workoutdiary.feature.main.api.MainViewState -> state.exerciseDescription })
+            arrayOf(
+                "name",
+                "Squat",
+                { state: ru.pricklycactus.workoutdiary.feature.main.api.MainViewState -> state.exerciseName }
+            ),
+            arrayOf(
+                "description",
+                "Leg day",
+                { state: ru.pricklycactus.workoutdiary.feature.main.api.MainViewState -> state.exerciseDescription }
+            )
         )
     }
 }

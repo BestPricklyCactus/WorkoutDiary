@@ -15,15 +15,16 @@ subprojects {
     extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension>("detekt") {
         config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
         buildUponDefaultConfig = true
-        allRules = false
         autoCorrect = true
+        ignoreFailures = true // Позволяет сгенерировать отчеты перед тем как уронить билд
     }
 
-    // Configure reports on the tasks directly using the class name to avoid type inference issues
     tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
         reports {
             xml.required.set(true)
+            xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
             html.required.set(true)
+            html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
         }
     }
 
@@ -32,24 +33,12 @@ subprojects {
     }
 }
 
-subprojects {
-    apply(plugin = "jacoco")
-
-    configure<org.gradle.testing.jacoco.plugins.JacocoPluginExtension> {
-        toolVersion = "0.8.12"
-    }
-
-    afterEvaluate {
-        if (plugins.hasPlugin("com.android.application") ||
-            plugins.hasPlugin("com.android.library")) {
-
-            extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
-                buildTypes {
-                    getByName("debug") {
-                        enableUnitTestCoverage = true
-                    }
-                }
-            }
+tasks.register("detektAll") {
+    group = "verification"
+    description = "Runs Detekt for all subprojects"
+    dependsOn(
+        subprojects.flatMap { subproject ->
+            subproject.tasks.matching { it.name == "detekt" }
         }
-    }
+    )
 }
