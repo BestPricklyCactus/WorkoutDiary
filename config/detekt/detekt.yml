@@ -14,14 +14,6 @@ config:
   # when writing own rules with transitive dependencies, locally analyze the path to your ruleset jar
   # userRulesetPath: 'build/libs/my-ruleset.jar'
 
-processor:
-  active: true
-  exclude:
-    - '**/test/**'
-    - '**/androidTest/**'
-    - '**/build/**'
-    - '**/resources/**'
-
 console-reports:
   active: true
   exclude:
@@ -40,13 +32,9 @@ complexity:
     active: true
     threshold: 10
     includeStaticDeclarations: false
-    includeInferredDeclarations: false
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: true
     threshold: 15
-    ignoreSingleExpression: false
-    ignoreSimpleDefinition: false
-    ignoreStaticDeclaration: false
   LargeClass:
     active: true
     threshold: 600
@@ -55,7 +43,8 @@ complexity:
     threshold: 60
   LongParameterList:
     active: true
-    threshold: 6
+    functionThreshold: 6
+    constructorThreshold: 6
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
@@ -79,12 +68,10 @@ naming:
     active: true
     functionPattern: '[a-z][a-zA-Z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
   VariableNaming:
     active: true
     variablePattern: '[a-z][a-zA-Z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
 
 style:
   active: true

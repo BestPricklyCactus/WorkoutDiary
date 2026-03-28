@@ -1,17 +1,18 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.ksp) apply false
-    alias(libs.plugins.detekt)
+    alias(libs.plugins.detekt) apply false
 }
+
+val detektFormatting = libs.detekt.formatting
 
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
-    detekt {
+    extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension>("detekt") {
         config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
         buildUponDefaultConfig = true
         allRules = false
@@ -19,6 +20,6 @@ subprojects {
     }
 
     dependencies {
-        detektPlugins(libs.detekt.formatting)
+        "detektPlugins"(detektFormatting)
     }
 }

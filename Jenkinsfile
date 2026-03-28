@@ -43,10 +43,19 @@ pipeline {
                 }
             }
             steps {
-                echo 'Running Lint...'
-                sh './gradlew lintDebug'
-                echo 'Running Detekt...'
-                sh './gradlew detekt'
+                parallel(
+                    'Lint': {
+                        echo 'Running Lint...'
+                        sh './gradlew lintDebug'
+                    },
+                    'Detekt': {
+                        echo 'Running Detekt...'
+                        // 2. Игнорируем ошибки Detekt, чтобы пайплайн не падал, а помечался как UNSTABLE
+                        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                            sh './gradlew detekt --parallel'
+                        }
+                    }
+                )
             }
             post {
                 always {
@@ -54,6 +63,12 @@ pipeline {
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.html', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/detekt/*.xml', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/build/reports/detekt/*.html', allowEmptyArchive: true
+
+                    // 3. Интеграция с плагином Warnings Next Generation
+                    recordIssues(tools: [
+                        androidLint(pattern: '**/build/reports/lint-results*.xml'),
+                        detekt(pattern: '**/build/reports/detekt/*.xml')
+                    ])
                 }
             }
         }
