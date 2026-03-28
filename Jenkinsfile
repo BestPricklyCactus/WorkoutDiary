@@ -42,13 +42,32 @@ pipeline {
                 }
             }
             steps {
-                echo 'Running Lint...'
-                sh './gradlew lintDebug'
+                parallel(
+                    'Lint': {
+                        echo 'Running Lint...'
+                        sh './gradlew lintDebug'
+                    },
+                    'Detekt': {
+                        echo 'Running Detekt...'
+                        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                            sh './gradlew detekt --parallel'
+                        }
+                    }
+                )
             }
             post {
                 always {
+                    // Debug: list all XML reports found
+                    sh 'find . -name "*.xml" | grep reports || true'
+
                     archiveArtifacts artifacts: '**/build/reports/lint-results*.xml', allowEmptyArchive: true
-                    archiveArtifacts artifacts: '**/build/reports/lint-results*.html', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/detekt/*.xml', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/detekt/*.html', allowEmptyArchive: true
+
+                    recordIssues(tools: [
+                        androidLintParser(pattern: '**/build/reports/lint-results*.xml'),
+                        detekt(pattern: '**/build/reports/detekt/*.xml')
+                    ])
                 }
             }
         }
