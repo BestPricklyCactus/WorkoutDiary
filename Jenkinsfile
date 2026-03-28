@@ -89,15 +89,18 @@ pipeline {
                         def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                         if (fileExists(reportPath)) {
                             def lineData = sh(script: '''python3 - <<'PY'
-import re
 from pathlib import Path
-path = Path("app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-text = path.read_text(encoding="utf-8")
-match = re.search(r'<counter type="LINE" missed="(\d+)" covered="(\d+)"', text)
-if match:
-    print(match.group(1), match.group(2))
+
+text = Path("app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml").read_text(encoding="utf-8")
+marker = 'counter type="LINE" missed="'
+start = text.find(marker)
+if start != -1:
+    start += len(marker)
+    rest = text[start:]
+    missed, rest = rest.split('" covered="', 1)
+    covered = rest.split('"', 1)[0]
+    print(missed, covered)
 PY''', returnStdout: true).trim()
-                            def lineMatcher = (lineData =~ /missed="(\d+)" covered="(\d+)"/)
                             if (lineData) {
                                 def parts = lineData.tokenize(' ')
                                 def missed = parts[0].toInteger()
