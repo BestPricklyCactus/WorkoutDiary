@@ -34,10 +34,9 @@ pipeline {
         stage('Lint & Static Analysis') {
             when {
                 anyOf {
-                    environment name: 'BRANCH_NAME', value: 'feature/*'
-                    environment name: 'BRANCH_NAME', value: 'develop'
-                    environment name: 'BRANCH_NAME', value: 'main'
-                    branch 'feature/*'
+                    branch 'develop'
+                    branch 'main'
+                    expression { env.BRANCH_NAME?.startsWith('feature/') }
                     changeRequest()
                     triggeredBy 'TimerTrigger'
                 }
@@ -71,7 +70,7 @@ pipeline {
                         def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                         if (fileExists(reportPath)) {
                             def reportContent = readFile(reportPath)
-                            def lineMatcher = (reportContent =~ /<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/)
+                            def lineMatcher = (reportContent =~ /<counter type="LINE" missed="(\d+)" covered="(\d+)"\s*\/?>(?:<\/counter>)?/) 
                             if (lineMatcher.find()) {
                                 def missed = lineMatcher.group(1).toInteger()
                                 def covered = lineMatcher.group(2).toInteger()
@@ -80,7 +79,7 @@ pipeline {
                                 echo String.format('JaCoCo LINE coverage: %.2f%% (%d/%d)', coverage, covered, total)
                                 currentBuild.description = String.format('Coverage: %.2f%%', coverage)
                             } else {
-                                echo 'JaCoCo coverage counter for LINE was not found in XML report.'
+                                echo 'JaCoCo LINE coverage counter was not found in XML report. Check app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                             }
                         } else {
                             echo 'JaCoCo XML report not found.'
@@ -93,19 +92,20 @@ pipeline {
         stage('Build Debug APK') {
             when {
                 anyOf {
-                    environment name: 'BRANCH_NAME', value: 'main'
-                    environment name: 'BRANCH_NAME', value: 'develop'
-                    environment name: 'BRANCH_NAME', value: 'feature/*'
+                    branch 'main'
+                    branch 'develop'
+                    expression { env.BRANCH_NAME?.startsWith('feature/') }
                     changeRequest()
                 }
             }
             steps {
                 echo 'Building Debug APK...'
                 sh './gradlew assembleDebug'
+                sh 'find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) | sort || true'
             }
             post {
-                success {
-                    archiveArtifacts artifacts: 'app/build/outputs/apk/debug/*.apk', fingerprint: true
+                always {
+                    archiveArtifacts artifacts: 'app/build/outputs/**/*.apk, app/build/outputs/**/*.aab', fingerprint: true, allowEmptyArchive: true
                 }
             }
         }
