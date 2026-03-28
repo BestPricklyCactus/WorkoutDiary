@@ -74,6 +74,10 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -230,45 +234,47 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Preview*.*"
     )
 
-    val coverageProjects = listOf(
-        project,
-        project(":core:mvi"),
-        project(":data"),
-        project(":feature:common"),
-        project(":feature:main:api"),
-        project(":feature:main:impl"),
-        project(":feature:editor:api"),
-        project(":feature:editor:impl"),
-        project(":feature:history:api"),
-        project(":feature:history:impl"),
-        project(":feature:report:api"),
-        project(":feature:report:impl"),
-        project(":feature:workout:api"),
-        project(":feature:workout:impl"),
-        project(":feature:aiworkout:api"),
-        project(":feature:aiworkout:impl")
+    val coverageProjectDirs = listOf(
+        project.projectDir,
+        project(":core:mvi").projectDir,
+        project(":data").projectDir,
+        project(":feature:common").projectDir,
+        project(":feature:main:api").projectDir,
+        project(":feature:main:impl").projectDir,
+        project(":feature:editor:api").projectDir,
+        project(":feature:editor:impl").projectDir,
+        project(":feature:history:api").projectDir,
+        project(":feature:history:impl").projectDir,
+        project(":feature:report:api").projectDir,
+        project(":feature:report:impl").projectDir,
+        project(":feature:workout:api").projectDir,
+        project(":feature:workout:impl").projectDir,
+        project(":feature:aiworkout:api").projectDir,
+        project(":feature:aiworkout:impl").projectDir,
     )
 
-    classDirectories.setFrom(
-        coverageProjects.flatMap { moduleProject ->
-            listOf(
-                moduleProject.fileTree("${moduleProject.layout.buildDirectory.get()}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
-                    exclude(excludes)
-                },
-                moduleProject.fileTree("${moduleProject.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-                    exclude(excludes)
-                }
-            )
-        }
-    )
-    sourceDirectories.setFrom(
-        coverageProjects.flatMap { moduleProject ->
-            listOf(
-                moduleProject.file("src/main/java"),
-                moduleProject.file("src/main/kotlin")
-            )
-        }
-    )
+    classDirectories.setFrom(files(coverageProjectDirs.flatMap { moduleDir ->
+        listOf(
+            fileTree(moduleDir) {
+                include("build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/**/*.class")
+                exclude(excludes)
+            },
+            fileTree(moduleDir) {
+                include("build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes/**/*.class")
+                exclude(excludes)
+            },
+            fileTree(moduleDir) {
+                include("build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/**/*.class")
+                exclude(excludes)
+            }
+        )
+    }))
+    sourceDirectories.setFrom(files(coverageProjectDirs.flatMap { moduleDir ->
+        listOf(
+            File(moduleDir, "src/main/java"),
+            File(moduleDir, "src/main/kotlin")
+        )
+    }))
     executionData.setFrom(
         fileTree(layout.buildDirectory) {
             include(
@@ -329,4 +335,5 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(libs.jacoco.agent)
 }
