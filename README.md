@@ -26,10 +26,10 @@ Android-приложение для ведения дневника тренир
 - настроена публикация в RuStore через Gradle task `publishToRuStore`;
 - добавлена release-подпись сборки через параметры из `local.properties`.
 
-### Версия 1.1
+### Версия 1.2
 
-- `versionName`: `1.1`
-- `versionCode`: `11`
+- `versionName`: `1.2`
+- `versionCode`: `12`
 - Добавлена фича "Формирование отчета за заданный период"
 
 ### Шаблон для следующей версии
@@ -66,6 +66,35 @@ Android-приложение для ведения дневника тренир
 - Room
 - MVI
 - OpenRouter API
+- JUnit 4
+- RuStore API
+
+## Тестирование
+
+Для unit-тестов использовались:
+
+- JUnit 4 - основной тестовый фреймворк;
+- kotlinx-coroutines-test - для тестирования coroutine- и MVI-логики;
+- MockK - для моков и изоляции зависимостей;
+- тестовые фикстуры `MainDispatcherRule` и `FakeDaos` - для управления dispatcher и упрощения тестовых сценариев.
+
+Команда для запуска unit-тестов:
+
+```bash
+./gradlew :app:testDebugUnitTest
+```
+
+Команда для генерации отчета покрытия JaCoCo:
+
+```bash
+./gradlew :app:jacocoTestReport
+```
+
+HTML-отчет по покрытию доступен по пути:
+
+```text
+app/build/reports/jacoco/jacocoTestReport/html/index.html
+```
 
 ## Архитектура
 
@@ -149,9 +178,9 @@ llmModel=meta-llama/llama-3.1-8b-instruct
 
 Важно:
 
-- не добавляй `local.properties` в git
-- не публикуй API key в репозитории
-- если ключ скомпрометирован, удали его в OpenRouter и создай новый
+- не добавлять `local.properties` в git
+- не публиковать API key в репозитории
+- если ключ скомпрометирован, удалить его в OpenRouter и создать новый
 
 ## RuStore API
 

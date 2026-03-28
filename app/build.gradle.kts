@@ -1,4 +1,5 @@
 import org.gradle.api.GradleException
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -30,6 +31,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
+    jacoco
+}
+
+jacoco {
+    toolVersion = "0.8.12"
 }
 
 android {
@@ -193,6 +199,58 @@ afterEvaluate {
     }
 }
 
+tasks.register<JacocoReport>("jacocoTestReport") {
+    group = "verification"
+    description = "Generates JaCoCo coverage report for debug unit tests"
+
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val excludes = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*ComposableSingletons*.*",
+        "**/*_Factory*.*",
+        "**/*_Impl*.*",
+        "**/*_MembersInjector*.*",
+        "**/*Directions*.*",
+        "**/*Directions$*.*",
+        "**/*Args*.*",
+        "**/databinding/*Binding*.*",
+        "**/di/**",
+        "**/*Preview*.*"
+    )
+
+    val javaClasses = fileTree("${layout.buildDirectory.get()}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+        exclude(excludes)
+    }
+    val kotlinClasses = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(excludes)
+    }
+
+    classDirectories.setFrom(files(javaClasses, kotlinClasses))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "jacoco/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/**/*.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/**/*.ec"
+            )
+        }
+    )
+}
+
 dependencies {
     implementation(project(":core:mvi"))
     implementation(project(":data"))
@@ -233,6 +291,8 @@ dependencies {
     ksp(libs.dagger.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

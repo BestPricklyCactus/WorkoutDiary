@@ -59,12 +59,33 @@ pipeline {
                 not { triggeredBy 'TimerTrigger' }
             }
             steps {
-                echo 'Running Unit Tests...'
-                sh './gradlew testDebugUnitTest'
+                echo 'Running Unit Tests with coverage...'
+                sh './gradlew testDebugUnitTest jacocoTestReport'
             }
             post {
                 always {
                     junit '**/build/test-results/**/*.xml'
+                    archiveArtifacts artifacts: '**/build/reports/jacoco/**/*.xml', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/build/reports/jacoco/**/*.html', allowEmptyArchive: true
+                    script {
+                        def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
+                        if (fileExists(reportPath)) {
+                            def reportContent = readFile(reportPath)
+                            def lineMatcher = (reportContent =~ /<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/)
+                            if (lineMatcher.find()) {
+                                def missed = lineMatcher.group(1).toInteger()
+                                def covered = lineMatcher.group(2).toInteger()
+                                def total = missed + covered
+                                def coverage = total > 0 ? (covered * 100.0 / total) : 0.0
+                                echo String.format('JaCoCo LINE coverage: %.2f%% (%d/%d)', coverage, covered, total)
+                                currentBuild.description = String.format('Coverage: %.2f%%', coverage)
+                            } else {
+                                echo 'JaCoCo coverage counter for LINE was not found in XML report.'
+                            }
+                        } else {
+                            echo 'JaCoCo XML report not found.'
+                        }
+                    }
                 }
             }
         }
