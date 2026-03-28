@@ -70,7 +70,7 @@ pipeline {
                         def reportPath = 'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
                         if (fileExists(reportPath)) {
                             def reportContent = readFile(reportPath)
-                            def lineMatcher = (reportContent =~ /<counter type="LINE" missed="(\d+)" covered="(\d+)"\s*\/?>(?:<\/counter>)?/) 
+                            def lineMatcher = (reportContent =~ /<counter type="LINE" missed="(\d+)" covered="(\d+)"/)
                             if (lineMatcher.find()) {
                                 def missed = lineMatcher.group(1).toInteger()
                                 def covered = lineMatcher.group(2).toInteger()
