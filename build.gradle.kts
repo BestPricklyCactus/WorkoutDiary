@@ -22,13 +22,23 @@ subprojects {
     tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
         reports {
             xml.required.set(true)
-            xml.outputLocation.set(file("$buildDir/reports/detekt/detekt.xml"))
+            xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
             html.required.set(true)
-            html.outputLocation.set(file("$buildDir/reports/detekt/detekt.html"))
+            html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
         }
     }
 
     dependencies {
         "detektPlugins"(detektFormatting)
     }
+}
+
+tasks.register("detektAll") {
+    group = "verification"
+    description = "Runs Detekt for all subprojects"
+    dependsOn(
+        subprojects.flatMap { subproject ->
+            subproject.tasks.matching { it.name == "detekt" }
+        }
+    )
 }

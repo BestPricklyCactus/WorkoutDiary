@@ -50,7 +50,7 @@ pipeline {
                     'Detekt': {
                         echo 'Running Detekt...'
                         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                            sh './gradlew detekt --parallel'
+                            sh './gradlew detektAll --parallel'
                         }
                     }
                 )
