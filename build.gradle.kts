@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.CommonExtension
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -12,21 +14,20 @@ val detektFormatting = libs.detekt.formatting
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
-    // Базовая настройка Detekt через расширение
     extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension>("detekt") {
         config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
         buildUponDefaultConfig = true
         autoCorrect = true
     }
 
-    // Настройка генерации отчетов для всех задач Detekt (Main, Test и т.д.)
+    // Настройка всех задач Detekt во всех модулях
     tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class.java).configureEach {
         reports {
             xml.required.set(true)
             html.required.set(true)
-            xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
-            html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
         }
+        // Позволяем Jenkins обрабатывать ошибки самостоятельно
+        ignoreFailures = true
     }
 
     dependencies {
@@ -36,21 +37,22 @@ subprojects {
 
 subprojects {
     apply(plugin = "jacoco")
-
     configure<org.gradle.testing.jacoco.plugins.JacocoPluginExtension> {
         toolVersion = "0.8.12"
     }
-
-    afterEvaluate {
-        if (plugins.hasPlugin("com.android.application") ||
-            plugins.hasPlugin("com.android.library")) {
-
-            extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
-                buildTypes {
-                    getByName("debug") {
-                        enableUnitTestCoverage = true
-                    }
-                }
+    
+    // Используем современный CommonExtension вместо BaseExtension
+    pluginManager.withPlugin("com.android.application") {
+        extensions.configure<CommonExtension<*, *, *, *, *, *>>("android") {
+            buildTypes.getByName("debug") {
+                enableUnitTestCoverage = true
+            }
+        }
+    }
+    pluginManager.withPlugin("com.android.library") {
+        extensions.configure<CommonExtension<*, *, *, *, *, *>>("android") {
+            buildTypes.getByName("debug") {
+                enableUnitTestCoverage = true
             }
         }
     }
