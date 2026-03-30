@@ -29,7 +29,8 @@ import java.util.Locale
 fun HistoryScreen(
     state: HistoryViewState,
     store: HistoryStore,
-    onNavigateToReport: () -> Unit
+    onNavigateToReport: () -> Unit,
+    onWorkoutClick: (Long) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -73,7 +74,7 @@ fun HistoryScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .combinedClickable(
-                                onClick = {},
+                                onClick = { onWorkoutClick(workout.workoutDate) },
                                 onLongClick = {
                                     store.dispatch(HistoryIntent.RequestWorkoutDeletion(workout.workoutDate))
                                 }

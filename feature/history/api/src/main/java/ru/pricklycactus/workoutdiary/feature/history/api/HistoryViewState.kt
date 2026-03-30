@@ -16,5 +16,6 @@ data class WorkoutHistoryEntry(
 data class WorkoutHistoryItem(
     val exerciseName: String,
     val sets: Int,
-    val reps: Int
+    val reps: Int,
+    val exerciseDurationMillis: Long
 )

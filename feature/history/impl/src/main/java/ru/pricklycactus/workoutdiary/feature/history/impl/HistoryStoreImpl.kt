@@ -48,7 +48,8 @@ class HistoryStoreImpl(
                                 WorkoutHistoryItem(
                                     exerciseName = entry.exercise.name,
                                     sets = entry.workout.sets,
-                                    reps = entry.workout.reps
+                                    reps = entry.workout.reps,
+                                    exerciseDurationMillis = entry.workout.exerciseDurationMillis
                                 )
                             }
                         )

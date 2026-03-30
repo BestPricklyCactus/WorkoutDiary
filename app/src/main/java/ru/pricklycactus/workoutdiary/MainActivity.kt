@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import ru.pricklycactus.workoutdiary.feature.aiworkout.impl.AiWorkoutScreen
 import ru.pricklycactus.workoutdiary.feature.editor.impl.EditorScreen
 import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryScreen
+import ru.pricklycactus.workoutdiary.feature.history.impl.HistoryWorkoutDetailScreen
 import ru.pricklycactus.workoutdiary.feature.main.impl.MainScreen
 import ru.pricklycactus.workoutdiary.feature.report.impl.ReportScreen
 import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutScreen
@@ -49,6 +50,8 @@ class MainActivity : ComponentActivity() {
 
             val mainStore = remember { storeFactory.createMainStore(scope) }
             val mainState by mainStore.state.collectAsState()
+            val historyStore = remember { storeFactory.createHistoryStore(scope) }
+            val historyState by historyStore.state.collectAsState()
 
             WorkoutDiaryTheme {
                 Scaffold(
@@ -99,14 +102,25 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Screen.History.route) {
-                            val historyStore = remember { storeFactory.createHistoryStore(scope) }
-                            val historyState by historyStore.state.collectAsState()
-
                             HistoryScreen(
                                 state = historyState,
                                 store = historyStore,
-                                onNavigateToReport = { navController.navigate(ScreenRoutes.Report) }
+                                onNavigateToReport = { navController.navigate(ScreenRoutes.Report) },
+                                onWorkoutClick = { workoutDate ->
+                                    navController.navigate("${ScreenRoutes.HistoryDetail}/$workoutDate")
+                                }
                             )
+                        }
+                        composable("${ScreenRoutes.HistoryDetail}/{workoutDate}") { backStackEntry ->
+                            val workoutDate = backStackEntry.arguments?.getString("workoutDate")?.toLongOrNull()
+                            val workout = historyState.workouts.firstOrNull { it.workoutDate == workoutDate }
+
+                            if (workout != null) {
+                                HistoryWorkoutDetailScreen(
+                                    workout = workout,
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
                         }
                         composable(ScreenRoutes.Report) {
                             val reportStore = remember { storeFactory.createReportStore(scope) }
@@ -157,6 +171,7 @@ object ScreenRoutes {
     const val AiWorkout = "ai_workout"
     const val WorkoutProcess = "workout_process"
     const val Report = "report"
+    const val HistoryDetail = "history_detail"
 }
 
 val items = listOf(
