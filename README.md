@@ -105,6 +105,7 @@ app/build/reports/jacoco/jacocoTestReport/html/index.html
 - `app` отвечает за DI, навигацию и связывание feature-модулей;
 - каждая фича вынесена в отдельные модули `api` и `impl`;
 - состояние экрана хранится в `Store` (`MviStore`), UI только отображает `State` и отправляет `Intent`;
+- создание store централизовано через `StoreFactory`, чтобы `MainActivity` не собирала зависимости вручную;
 - доступ к данным идет через `WorkoutRepository`;
 - локальное хранение реализовано через `Room` (`DAO -> repository -> domain models`);
 - внешняя AI-интеграция вынесена в отдельную feature `aiworkout`.

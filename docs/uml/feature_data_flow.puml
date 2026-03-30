@@ -6,6 +6,8 @@ skinparam shadowing false
 skinparam defaultFontName Arial
 
 start
+:MainActivity/Navigation requests Store;
+:StoreFactory creates Feature Store;
 :User action;
 :Screen dispatches Intent;
 :Feature Store receives Intent;

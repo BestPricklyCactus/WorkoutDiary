@@ -8,6 +8,7 @@ skinparam defaultFontName Arial
 
 actor User
 rectangle "Compose Screen" as UI
+rectangle "StoreFactory" as StoreFactory
 rectangle "Store\n(MVI)" as Store
 rectangle "ViewState" as State
 rectangle "WorkoutRepository" as Repo
@@ -15,6 +16,8 @@ rectangle "Room DAO / SQLite" as Room
 rectangle "External API\n(OpenRouter, RuStore)" as Api
 
 User --> UI : действие пользователя
+UI --> StoreFactory : запрос Store
+StoreFactory --> Store : create...
 UI --> Store : Intent
 Store --> State : updateState(...)
 State --> UI : render(state)

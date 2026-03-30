@@ -10,6 +10,7 @@ package "app" {
   [MainActivity]
   [Navigation]
   [DI / AppComponent]
+  [StoreFactory]
 }
 
 package "core:mvi" {
@@ -42,12 +43,20 @@ package "External Services" {
 
 [MainActivity] --> [Navigation]
 [MainActivity] --> [DI / AppComponent]
+[MainActivity] --> [StoreFactory]
 [Navigation] --> [main]
 [Navigation] --> [editor]
 [Navigation] --> [history]
 [Navigation] --> [report]
 [Navigation] --> [workout]
 [Navigation] --> [aiworkout]
+
+[StoreFactory] --> [main]
+[StoreFactory] --> [editor]
+[StoreFactory] --> [history]
+[StoreFactory] --> [report]
+[StoreFactory] --> [workout]
+[StoreFactory] --> [aiworkout]
 
 [main] --> [MviStore]
 [editor] --> [MviStore]
