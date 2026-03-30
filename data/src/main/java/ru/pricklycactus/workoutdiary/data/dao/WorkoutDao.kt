@@ -33,4 +33,7 @@ interface WorkoutDao {
 
     @Delete
     suspend fun deleteWorkout(workout: Workout)
+
+    @Query("DELETE FROM workouts WHERE workoutDate = :workoutDate")
+    suspend fun deleteWorkoutsByDate(workoutDate: Long)
 }

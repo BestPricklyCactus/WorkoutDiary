@@ -3,7 +3,8 @@ package ru.pricklycactus.workoutdiary.feature.history.api
 import ru.pricklycactus.workoutdiary.core.mvi.MviState
 
 data class HistoryViewState(
-    val workouts: List<WorkoutHistoryEntry> = emptyList()
+    val workouts: List<WorkoutHistoryEntry> = emptyList(),
+    val workoutDatePendingDeletion: Long? = null
 ) : MviState
 
 data class WorkoutHistoryEntry(

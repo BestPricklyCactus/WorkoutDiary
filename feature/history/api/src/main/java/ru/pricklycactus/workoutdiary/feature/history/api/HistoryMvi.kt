@@ -13,6 +13,9 @@ interface HistoryStore {
 
 sealed interface HistoryIntent : MviIntent {
     data object LoadHistory : HistoryIntent
+    data class RequestWorkoutDeletion(val workoutDate: Long) : HistoryIntent
+    data object DismissWorkoutDeletion : HistoryIntent
+    data object ConfirmWorkoutDeletion : HistoryIntent
 }
 
 sealed interface HistoryEffect : MviEffect

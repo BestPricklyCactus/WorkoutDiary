@@ -40,4 +40,7 @@ class WorkoutRepository @Inject constructor(
 
     suspend fun insertWorkouts(workouts: List<WorkoutDomain>) =
         workoutDao.insertWorkouts(workouts.map { it.toEntity() })
+
+    suspend fun deleteWorkoutsByDate(workoutDate: Long) =
+        workoutDao.deleteWorkoutsByDate(workoutDate)
 }

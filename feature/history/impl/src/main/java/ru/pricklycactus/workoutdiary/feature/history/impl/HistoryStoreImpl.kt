@@ -24,6 +24,13 @@ class HistoryStoreImpl(
     override fun dispatch(intent: HistoryIntent) {
         when (intent) {
             HistoryIntent.LoadHistory -> observeHistory()
+            is HistoryIntent.RequestWorkoutDeletion -> updateState {
+                it.copy(workoutDatePendingDeletion = intent.workoutDate)
+            }
+            HistoryIntent.DismissWorkoutDeletion -> updateState {
+                it.copy(workoutDatePendingDeletion = null)
+            }
+            HistoryIntent.ConfirmWorkoutDeletion -> deletePendingWorkout()
         }
     }
 
@@ -49,6 +56,14 @@ class HistoryStoreImpl(
 
                 updateState { it.copy(workouts = grouped) }
             }
+        }
+    }
+
+    private fun deletePendingWorkout() {
+        val workoutDate = currentState.workoutDatePendingDeletion ?: return
+        scope.launch {
+            repository.deleteWorkoutsByDate(workoutDate)
+            updateState { it.copy(workoutDatePendingDeletion = null) }
         }
     }
 }

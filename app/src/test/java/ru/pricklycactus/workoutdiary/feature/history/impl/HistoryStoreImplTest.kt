@@ -5,11 +5,13 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import ru.pricklycactus.workoutdiary.data.database.Exercise
 import ru.pricklycactus.workoutdiary.data.database.Workout
 import ru.pricklycactus.workoutdiary.data.model.WorkoutWithExercise
+import ru.pricklycactus.workoutdiary.feature.history.api.HistoryIntent
 import ru.pricklycactus.workoutdiary.testutil.MainDispatcherRule
 import ru.pricklycactus.workoutdiary.testutil.createWorkoutRepository
 
@@ -55,6 +57,30 @@ class HistoryStoreImplTest {
 
         // Assert
         assertEquals(listOf("Bench", "Row"), store.state.value.workouts.single().exercises.map { it.exerciseName })
+        coroutineContext.cancelChildren()
+    }
+
+    @Test
+    fun GivenWorkoutMarkedForDeletion_WhenConfirmed_ThenWorkoutIsRemovedFromState() = runTest {
+        // Arrange
+        val repository = createWorkoutRepository(
+            workouts = listOf(
+                workoutWithExercise(2_000L, "Bench", 4, 10),
+                workoutWithExercise(2_000L, "Row", 3, 12),
+                workoutWithExercise(1_000L, "Squat", 3, 8)
+            )
+        )
+        val store = HistoryStoreImpl(repository, this)
+        advanceUntilIdle()
+
+        // Act
+        store.dispatch(HistoryIntent.RequestWorkoutDeletion(2_000L))
+        store.dispatch(HistoryIntent.ConfirmWorkoutDeletion)
+        advanceUntilIdle()
+
+        // Assert
+        assertEquals(listOf(1_000L), store.state.value.workouts.map { it.workoutDate })
+        assertNull(store.state.value.workoutDatePendingDeletion)
         coroutineContext.cancelChildren()
     }
 

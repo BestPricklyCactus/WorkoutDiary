@@ -4,4 +4,9 @@
     <string name="history_total_time" translatable="false">Общее время: %s</string>
     <string name="history_exercise_format" translatable="false">%1$s: %2$d x %3$d</string>
     <string name="history_show_report" translatable="false">Показать отчет</string>
+    <string name="history_delete_hint" translatable="false">Удерживайте карточку тренировки, чтобы удалить ее</string>
+    <string name="history_delete_dialog_title" translatable="false">Удалить тренировку?</string>
+    <string name="history_delete_dialog_message" translatable="false">Тренировка будет удалена без возможности восстановления.</string>
+    <string name="history_delete_confirm" translatable="false">Удалить</string>
+    <string name="history_delete_cancel" translatable="false">Отмена</string>
 </resources>
