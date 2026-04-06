@@ -3,6 +3,7 @@ package ru.pricklycactus.workoutdiary
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -12,8 +13,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -30,6 +29,7 @@ import ru.pricklycactus.workoutdiary.feature.main.impl.MainScreen
 import ru.pricklycactus.workoutdiary.feature.report.impl.ReportScreen
 import ru.pricklycactus.workoutdiary.feature.workout.impl.WorkoutScreen
 import ru.pricklycactus.workoutdiary.di.StoreFactory
+import ru.pricklycactus.workoutdiary.di.StoresViewModel
 import ru.pricklycactus.workoutdiary.ui.theme.WorkoutDiaryTheme
 import javax.inject.Inject
 
@@ -37,6 +37,10 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var storeFactory: StoreFactory
+
+    private val storesViewModel: StoresViewModel by viewModels {
+        StoresViewModel.Factory(storeFactory)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +50,10 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
-            val scope = rememberCoroutineScope()
 
-            val mainStore = remember { storeFactory.createMainStore(scope) }
+            val mainStore = storesViewModel.mainStore
             val mainState by mainStore.state.collectAsState()
-            val historyStore = remember { storeFactory.createHistoryStore(scope) }
+            val historyStore = storesViewModel.historyStore
             val historyState by historyStore.state.collectAsState()
 
             WorkoutDiaryTheme {
@@ -90,15 +93,16 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(ScreenRoutes.WorkoutProcess) {
                             val selectedExercises = mainState.exercises.filter { it.id in mainState.selectedExerciseIds }
-                            val workoutStore = remember {
-                                storeFactory.createWorkoutStore(selectedExercises, scope)
-                            }
+                            val workoutStore = storesViewModel.getOrCreateWorkoutStore(selectedExercises)
                             val workoutState by workoutStore.state.collectAsState()
 
                             WorkoutScreen(
                                 state = workoutState,
                                 store = workoutStore,
-                                onBack = { navController.popBackStack() }
+                                onBack = {
+                                    storesViewModel.clearWorkoutStore()
+                                    navController.popBackStack()
+                                }
                             )
                         }
                         composable(Screen.History.route) {
@@ -123,7 +127,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable(ScreenRoutes.Report) {
-                            val reportStore = remember { storeFactory.createReportStore(scope) }
+                            val reportStore = storesViewModel.reportStore
                             val reportState by reportStore.state.collectAsState()
 
                             ReportScreen(
@@ -133,7 +137,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Screen.Editor.route) {
-                            val editorStore = remember { storeFactory.createEditorStore(scope) }
+                            val editorStore = storesViewModel.editorStore
                             val editorState by editorStore.state.collectAsState()
 
                             EditorScreen(
@@ -142,7 +146,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Screen.AiWorkout.route) {
-                            val aiWorkoutStore = remember { storeFactory.createAiWorkoutStore(scope) }
+                            val aiWorkoutStore = storesViewModel.aiWorkoutStore
                             val aiWorkoutState by aiWorkoutStore.state.collectAsState()
 
                             AiWorkoutScreen(

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -112,45 +113,55 @@ fun ReportScreen(
                 Text(stringResource(R.string.report_share))
             }
         }
-        Column(verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
-            Row(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
-            ) {
-                ReportPeriod.entries.forEach { period ->
-                    FilterChip(
-                        selected = state.selectedReportPeriod == period,
-                        onClick = { store.dispatch(ReportIntent.SelectReportPeriod(period)) },
-                        label = { Text(text = stringResource(period.labelResId())) }
-                    )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)
+                ) {
+                    ReportPeriod.entries.forEach { period ->
+                        FilterChip(
+                            selected = state.selectedReportPeriod == period,
+                            onClick = { store.dispatch(ReportIntent.SelectReportPeriod(period)) },
+                            label = { Text(text = stringResource(period.labelResId())) }
+                        )
+                    }
                 }
             }
+
             if (state.selectedReportPeriod == ReportPeriod.CUSTOM) {
-                Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
-                    Button(onClick = { store.dispatch(ReportIntent.PickCustomStartDate) }) {
-                        Text(
-                            stringResource(
-                                R.string.report_start_date,
-                                state.customStartDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.ItemSpacing)) {
+                        Button(onClick = { store.dispatch(ReportIntent.PickCustomStartDate) }) {
+                            Text(
+                                stringResource(
+                                    R.string.report_start_date,
+                                    state.customStartDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)
+                                )
                             )
-                        )
-                    }
-                    Button(onClick = { store.dispatch(ReportIntent.PickCustomEndDate) }) {
-                        Text(
-                            stringResource(
-                                R.string.report_end_date,
-                                state.customEndDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)
+                        }
+                        Button(onClick = { store.dispatch(ReportIntent.PickCustomEndDate) }) {
+                            Text(
+                                stringResource(
+                                    R.string.report_end_date,
+                                    state.customEndDate?.let(::formatPickerDate) ?: stringResource(R.string.report_select_date)
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
-            if (state.report.hasData) {
-                ReportTableView(
-                    state.report
-                )
-            } else {
-                Text(text = stringResource(R.string.report_empty), style = MaterialTheme.typography.bodyMedium)
+
+            item {
+                if (state.report.hasData) {
+                    ReportTableView(state.report)
+                } else {
+                    Text(text = stringResource(R.string.report_empty), style = MaterialTheme.typography.bodyMedium)
+                }
             }
         }
     }
